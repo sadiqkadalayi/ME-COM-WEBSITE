@@ -13,31 +13,34 @@ const SearchBar = () => {
   const debounceRef = useRef();
 
 
-  const handleChange = (e) => {
 
-    const API_URL = process.env.REACT_APP_API_BASE_URL;
+
+  // Handles input changes and triggers search with debounce
+  const handleChange = (e) => {
     const value = e.target.value;
     setQuery(value);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (value.length > 1) {
-      setLoading(true);
-      debounceRef.current = setTimeout(async () => {
-        try {
-          // Use API_URL as the base for the endpoint
-          const res = await axios.get(`${API_URL}/api/products/search?q=${encodeURIComponent(value)}`);
-          setResults(res.data);
-        } catch (err) {
-          setResults([]);
-        } finally {
-          setLoading(false);
-          setShowResults(true);
-        }
-      }, 400); // 400ms debounce
-    } else {
-      setShowResults(false);
-      setResults([]);
-      setLoading(false);
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
     }
+    if (value.trim() === '') {
+      setResults([]);
+      setShowResults(false);
+      return;
+    }
+    setLoading(true);
+    debounceRef.current = setTimeout(async () => {
+      try {
+        // Replace with your actual API endpoint
+        const response = await axios.get(`/api/products/search?q=${encodeURIComponent(value)}`);
+        setResults(response.data || []);
+        setShowResults(true);
+      } catch (error) {
+        setResults([]);
+        setShowResults(true);
+      } finally {
+        setLoading(false);
+      }
+    }, 400);
   };
 
   const handleClose = () => {
@@ -45,7 +48,7 @@ const SearchBar = () => {
   };
 
   return (
-    <Box sx={{ width: '100%', mb: 1, position: 'relative' }}>
+    <Box sx={{ width: '100%', mb: 1, position: 'relative', mt: 4 }}>
       <TextField
         value={query}
         onChange={handleChange}

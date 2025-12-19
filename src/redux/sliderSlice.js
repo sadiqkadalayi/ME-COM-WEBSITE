@@ -9,9 +9,8 @@ export const fetchSliderPosts = createAsyncThunk(
   async (_, thunkAPI) => {
     // Replace with your backend API endpoint
     const API_URL = process.env.REACT_APP_API_BASE_URL;
-    const response = await axios.get(`${API_URL}/api/slider-posts`);
-    if (!response.ok) throw new Error('Failed to fetch slider posts');
-    return await response.json();
+    const response = await axios.get(`${API_URL}/api/frond-end/slider-posts`);
+    return response.data;
   }
 );
 

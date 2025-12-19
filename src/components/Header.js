@@ -32,27 +32,40 @@ const Header = () => {
     <Box sx={{ flexGrow: 1 }}>
       {/* Top Info Bar */}
       <Box sx={{ background: '#0b3a4a', color: '#fff', fontSize: 13, py: 0.5, px: 2 }}>
-        <Container maxWidth="xl" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', px: { xs: 2, md: 0 } }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <EmailIcon sx={{ fontSize: 16, mr: 0.5, verticalAlign: 'middle' }} />
-            <span style={{ marginRight: 12 }}>info@megiftpacks.com</span>
-            <PhoneIcon sx={{ fontSize: 16, mr: 0.5, verticalAlign: 'middle' }} />
-            <span style={{ marginRight: 8 }}>+974 6642 6697</span>
-            <span style={{ marginRight: 8 }}>| 31331225</span>
-            <span>| 31331226</span>
+        <Container maxWidth="xl" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', px: { xs: 2, md: 0 }, py: { xs: 1, md: 1 } }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: { xs: 0.5, sm: 2 },
+              flexDirection: { xs: 'column', sm: 'row' },
+              textAlign: { xs: 'center', sm: 'left' },
+              width: '100%',
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <EmailIcon sx={{ fontSize: 16, mr: 0.5, verticalAlign: 'middle' }} />
+              <span style={{ marginRight: 8 }}>info@megiftpacks.com</span>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <PhoneIcon sx={{ fontSize: 16, mr: 0.5, verticalAlign: 'middle' }} />
+              <span style={{ marginRight: 8 }}>+974 6642 6697</span>
+              <span style={{ marginRight: 8 }}>| 31331225</span>
+              <span>| 31331226</span>
+            </Box>
           </Box>
         </Container>
       </Box>
       {/* Main AppBar */}
       <AppBar position="static" elevation={0} sx={{ background: '#fff', color: '#222', borderBottom: '1px solid #e0e0e0' }}>
         <Container maxWidth="xl" disableGutters sx={{ px: { xs: 0, md: 0 } }}>
-          <Toolbar sx={{ minHeight: 80, px: { xs: 2, md: 0 } }}>
+          <Toolbar sx={{ minHeight: 56, px: { xs: 2, md: 0 } }}>
             {/* Logo section: only logo (left) */}
             <Box sx={{ display: 'flex', alignItems: 'center', ml: 6 }}>
               <img 
                 src={Logo} 
                 alt="Logo" 
-                style={{ height: 60, marginRight: 16, cursor: 'pointer' }} 
+                style={{ height: 40, marginRight: 12, cursor: 'pointer' }} 
                 onClick={() => navigate('/')} 
               />
             </Box>
@@ -60,7 +73,9 @@ const Header = () => {
             <Box sx={{ flexGrow: 1 }} />
             {/* Right section: align with main content */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: { xs: 'auto', md: '100%' }, maxWidth: { xs: 'none', md: 1200 }, justifyContent: { xs: 'flex-end', md: 'flex-end' } }}>
-              <Button variant="contained" sx={{ background: '#0b3a4a', color: '#fff', borderRadius: 2, px: 1, fontWeight: 500,fontSize: 11, boxShadow: 'none', '&:hover': { background: '#14506b' }, display: { xs: 'none', md: 'block' } }}>
+              <Button variant="contained" 
+              onClick={()=>navigate('/contact-us')}
+              sx={{ background: '#0b3a4a', color: '#fff', borderRadius: 2, px: 1, fontWeight: 500,fontSize: 11, boxShadow: 'none', '&:hover': { background: '#14506b' }, display: { xs: 'none', md: 'block' } }}>
                 Contact Us
               </Button>
               <Typography variant="body2" sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 0.5, ml: 2,  fontSize: 13 }}>
@@ -90,7 +105,7 @@ const Header = () => {
         </Container>
         {/* Navigation Bar */}
         <Toolbar sx={{ minHeight: 48, background: '#fff', px: 0, borderTop: '1px solid #e0e0e0', display: 'flex', alignItems: 'center' }}>
-          <Container maxWidth="xl" sx={{ display: 'flex', alignItems: 'center', px: 0 }}>
+          <Container maxWidth="xl" sx={{ display: 'flex', alignItems: 'center', px: 0, mb: 1.5 }}>
             {/* Hamburger menu for mobile */}
             <Box sx={{ display: { xs: 'block', md: 'none' }, ml: 1, mr: 2 }}>
               <IconButton edge="start" color="inherit" aria-label="menu" onClick={handleDrawerToggle} sx={{ ml: 1 }}>
