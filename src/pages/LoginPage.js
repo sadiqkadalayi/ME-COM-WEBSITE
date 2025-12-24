@@ -1,23 +1,72 @@
-import React, { useState } from 'react';
-import { Box, Card, CardContent, Typography, TextField, Button, Grid, Link, Divider, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Card, CardContent, Typography, TextField, Button, Grid, Link, Divider, List, ListItem, ListItemIcon, ListItemText, Snackbar, Alert } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser, clearError } from '../redux/LoginSlice';
 
 
 const LoginPage = () => {
   const [form, setForm] = useState({ email: '', password: '' });
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading, error, success, user } = useSelector((state) => state.login || {});
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle login logic here
+    if (!form.email || !form.password) {
+      return;
+    }
+    dispatch(loginUser({
+      email: form.email,
+      password: form.password,
+    }));
   };
+
+  useEffect(() => {
+    if (error) {
+      setOpenSnackbar(true);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (success) {
+      setOpenSnackbar(true);
+      setTimeout(() => {
+        navigate('/dashboard'); // Navigate without resetting login state
+      }, 1500);
+    }
+  }, [success, navigate]);
+
+  useEffect(() => {
+    if (error) {
+      setOpenSnackbar(true);
+    }
+  }, [error]);
 
   return (
     <Box sx={{ minHeight: '80vh', bgcolor: '#fafbfc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {/* Error Snackbar */}
+        {error && (
+          <Snackbar open={Boolean(error)} autoHideDuration={4000} onClose={() => dispatch(clearError())} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+            <Alert onClose={() => dispatch(clearError())} severity="error" sx={{ width: '100%' }}>
+              {error}
+            </Alert>
+          </Snackbar>
+        )}
+        
+        {/* Success Snackbar */}
+        <Snackbar open={openSnackbar && success} autoHideDuration={1500} onClose={() => setOpenSnackbar(false)} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+          <Alert severity="success" sx={{ width: '100%' }}>
+            Login successful! Redirecting...
+          </Alert>
+        </Snackbar>
+        
         <Card sx={{ maxWidth: 900, width: '100%', borderRadius: 3, boxShadow: 6, p: 0, mt: { xs: 4, sm: 6, md: 2, lg: 0 } }}>
         <Grid container>
           {/* Left: Login Form */}
@@ -54,9 +103,10 @@ const LoginPage = () => {
                 <Button
                   type="submit"
                   variant="contained"
+                  disabled={loading}
                   sx={{ px: 4, py: 1, fontWeight: 700, borderRadius: 2, bgcolor: '#0b3a4a', fontSize: 11, '&:hover': { bgcolor: '#14506b' } }}
                 >
-                  SIGN IN
+                  {loading ? 'SIGNING IN...' : 'SIGN IN'}
                 </Button>
                 <Link onClick={() => navigate('/forgot-password')}  sx={{cursor: 'pointer', fontSize: 11, color: '#0b3a4a', fontWeight: 500 , ml:2}}>
                   Forgot your password?
@@ -92,6 +142,7 @@ const LoginPage = () => {
             <Button
               variant="contained"
               fullWidth
+              onClick={() => navigate('/register')}
               sx={{ mt: 1, py: 1, fontWeight: 700, borderRadius: 2, bgcolor: '#0b3a4a', fontSize: 11, '&:hover': { bgcolor: '#14506b' } }}
             >
               CREATE ACCOUNT

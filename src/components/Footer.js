@@ -34,7 +34,7 @@ const Footer = () => {
         <Container maxWidth="lg">
           <Grid container spacing={4}>
             {/* Column 1: About & Social */}
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <Typography variant="h5" fontWeight={600} gutterBottom>
                 The #1 premium corporate gifts supplier in the Middle East.
               </Typography>
@@ -57,9 +57,9 @@ const Footer = () => {
               </Box>
             </Grid>
             {/* Column 2: Links (3 sub-columns) */}
-            <Grid item xs={12} md={8}>
+            <Grid size={{ xs: 12, md: 8 }}>
               <Grid container spacing={2}>
-                <Grid item xs={12} md={4}>
+                <Grid size={{ xs: 12, md: 4 }}>
                   <Typography variant="subtitle2" fontWeight={600} gutterBottom>COMPANY INFO</Typography>
                   <Box>
                     <Link href="#" color="inherit" underline="hover">About Us</Link><br />
@@ -69,7 +69,7 @@ const Footer = () => {
                     <Link href="#" color="inherit" underline="hover">Contact Us</Link>
                   </Box>
                 </Grid>
-                <Grid item xs={12} md={4}>
+                <Grid size={{ xs: 12, md: 4 }}>
                   <Typography variant="subtitle2" fontWeight={600} gutterBottom>PRODUCTS</Typography>
                   <Box>
                     <Link href="#" color="inherit" underline="hover">Home</Link><br />
@@ -79,7 +79,7 @@ const Footer = () => {
                     <Link href="#" color="inherit" underline="hover">Branding Methods</Link>
                   </Box>
                 </Grid>
-                <Grid item xs={12} md={4}>
+                <Grid size={{ xs: 12, md: 4 }}>
                   <Typography variant="subtitle2" fontWeight={600} gutterBottom>SUPPORT</Typography>
                   <Box>
                     <Link href="#" color="inherit" underline="hover">FAQs</Link><br />
@@ -90,7 +90,7 @@ const Footer = () => {
                   </Box>
                 </Grid>
                 {/* Contact/Newsletter section below links, spanning all 3 sub-columns */}
-                <Grid item xs={12}>
+                <Grid size={{ xs: 12 }}>
                   <Divider sx={{ my: 2, background: 'rgba(255,255,255,0.2)' }} />
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
                     <Button variant="outlined" color="inherit" sx={{ borderRadius: 8, color: '#fff', borderColor: '#fff' }}>EMAIL</Button>

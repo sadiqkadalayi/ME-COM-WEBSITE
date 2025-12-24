@@ -3,6 +3,8 @@ import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import Logo from '../assets/Logo.png';
 import { useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { logout } from '../redux/LoginSlice';
 import { AppBar, Toolbar, Typography, Box, Button, IconButton, Container, Grid, Drawer, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -23,9 +25,19 @@ const navItems = [
 const Header = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { user, token } = useSelector((state) => state.login || {});
+  
+  // Check if user is logged in
+  const isLoggedIn = Boolean(user || token);
 
   const handleDrawerToggle = () => {
     setDrawerOpen((prev) => !prev);
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/'); // Redirect to home page after logout
   };
 
   return (
@@ -39,8 +51,9 @@ const Header = () => {
               alignItems: 'center',
               gap: { xs: 0.5, sm: 2 },
               flexDirection: { xs: 'column', sm: 'row' },
-              textAlign: { xs: 'center', sm: 'left' },
+              textAlign: 'center',
               width: '100%',
+              justifyContent: 'center',
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -58,48 +71,64 @@ const Header = () => {
       </Box>
       {/* Main AppBar */}
       <AppBar position="static" elevation={0} sx={{ background: '#fff', color: '#222', borderBottom: '1px solid #e0e0e0' }}>
-        <Container maxWidth="xl" disableGutters sx={{ px: { xs: 0, md: 0 } }}>
-          <Toolbar sx={{ minHeight: 56, px: { xs: 2, md: 0 } }}>
-            {/* Logo section: only logo (left) */}
-            <Box sx={{ display: 'flex', alignItems: 'center', ml: 6 }}>
+        <Container maxWidth="xl" disableGutters sx={{ px: { xs: 0, md: 0 }, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Toolbar sx={{ minHeight: 56, px: { xs: 2, md: 0 }, width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            {/* Centered content */}
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
               <img 
                 src={Logo} 
                 alt="Logo" 
-                style={{ height: 40, marginRight: 12, cursor: 'pointer' }} 
+                style={{ height: 40, marginRight: 12, marginLeft: 20, cursor: 'pointer' }} 
                 onClick={() => navigate('/')} 
               />
-            </Box>
-            {/* Spacer to push buttons to right */}
-            <Box sx={{ flexGrow: 1 }} />
-            {/* Right section: align with main content */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: { xs: 'auto', md: '100%' }, maxWidth: { xs: 'none', md: 1200 }, justifyContent: { xs: 'flex-end', md: 'flex-end' } }}>
-              <Button variant="contained" 
-              onClick={()=>navigate('/contact-us')}
-              sx={{ background: '#0b3a4a', color: '#fff', borderRadius: 2, px: 1, fontWeight: 500,fontSize: 11, boxShadow: 'none', '&:hover': { background: '#14506b' }, display: { xs: 'none', md: 'block' } }}>
-                Contact Us
-              </Button>
-              <Typography variant="body2" sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 0.5, ml: 2,  fontSize: 13 }}>
-                <Button 
-                  variant="text" 
-                  size="small"
-                  onClick={() => navigate('/login')}
-                  sx={{ minWidth: 'auto', px: 1, py: 0.5, fontWeight: 500, fontSize: 13, textTransform: 'none', color: '#2f2f30ff', '&:hover': { background: 'transparent', textDecoration: 'underline' } }}
-                >
-                  Sign In
+              <Box sx={{ flexGrow: 1 }} />
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'center' }}>
+                <Button variant="contained" 
+                  onClick={()=>navigate('/contact-us')}
+                  sx={{ background: '#0b3a4a', color: '#fff', borderRadius: 2, px: 1, fontWeight: 500,fontSize: 11, boxShadow: 'none', '&:hover': { background: '#14506b' }, display: { xs: 'none', md: 'block' } }}>
+                  Contact Us
                 </Button>
-                <span style={{ color: '#999' }}>or</span>
-                <Button 
-                  variant="text" 
-                  size="small"
-                  onClick={() => navigate('/register')}
-                  sx={{ minWidth: 'auto', px: 1, py: 0.5, fontWeight: 500, fontSize: 13, textTransform: 'none', color: '#2f2f30ff', '&:hover': { background: 'transparent', textDecoration: 'underline' } }}
-                >
-                  Register
-                </Button>
-              </Typography>
-              <IconButton color="inherit" sx={{ ml: 1,mr: 4 }}>
-                <ShoppingCartIcon />
-              </IconButton>
+                <Typography variant="body2" sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 0.5, ml: 2,  fontSize: 13 }}>
+                  {isLoggedIn ? (
+                    // Show when logged in
+                    <>
+                      <span style={{ color: '#2f2f30ff', fontSize: 13, marginRight: 8 }}>Welcome, {user?.name || 'User'}</span>
+                      <Button 
+                        variant="text" 
+                        size="small"
+                        onClick={handleLogout}
+                        sx={{ minWidth: 'auto', px: 1, py: 0.5, fontWeight: 500, fontSize: 13, textTransform: 'none', color: '#2f2f30ff', '&:hover': { background: 'transparent', textDecoration: 'underline' } }}
+                      >
+                        Logout
+                      </Button>
+                    </>
+                  ) : (
+                    // Show when not logged in
+                    <>
+                      <Button 
+                        variant="text" 
+                        size="small"
+                        onClick={() => navigate('/login')}
+                        sx={{ minWidth: 'auto', px: 1, py: 0.5, fontWeight: 500, fontSize: 13, textTransform: 'none', color: '#2f2f30ff', '&:hover': { background: 'transparent', textDecoration: 'underline' } }}
+                      >
+                        Sign In
+                      </Button>
+                      <span style={{ color: '#999' }}>or</span>
+                      <Button 
+                        variant="text" 
+                        size="small"
+                        onClick={() => navigate('/register')}
+                        sx={{ minWidth: 'auto', px: 1, py: 0.5, fontWeight: 500, fontSize: 13, textTransform: 'none', color: '#2f2f30ff', '&:hover': { background: 'transparent', textDecoration: 'underline' } }}
+                      >
+                        Register
+                      </Button>
+                    </>
+                  )}
+                </Typography>
+                <IconButton color="inherit" sx={{ ml: 1,mr: 4 }}>
+                  <ShoppingCartIcon />
+                </IconButton>
+              </Box>
             </Box>
           </Toolbar>
         </Container>
@@ -146,16 +175,35 @@ const Header = () => {
                   <ListItemText primary="Contact Us" />
                 </ListItemButton>
               </ListItem>
-              <ListItem disablePadding>
-                <ListItemButton onClick={() => navigate('/login')}>
-                  <ListItemText primary="Sign In" />
-                </ListItemButton>
-              </ListItem>
-              <ListItem disablePadding>
-                <ListItemButton onClick={() => navigate('/register')}>
-                  <ListItemText primary="Register" />
-                </ListItemButton>
-              </ListItem>
+              {isLoggedIn ? (
+                // Show when logged in
+                <>
+                  <ListItem disablePadding>
+                    <ListItemButton>
+                      <ListItemText primary={`Welcome, ${user?.name || 'User'}`} />
+                    </ListItemButton>
+                  </ListItem>
+                  <ListItem disablePadding>
+                    <ListItemButton onClick={handleLogout}>
+                      <ListItemText primary="Logout" />
+                    </ListItemButton>
+                  </ListItem>
+                </>
+              ) : (
+                // Show when not logged in
+                <>
+                  <ListItem disablePadding>
+                    <ListItemButton onClick={() => navigate('/login')}>
+                      <ListItemText primary="Sign In" />
+                    </ListItemButton>
+                  </ListItem>
+                  <ListItem disablePadding>
+                    <ListItemButton onClick={() => navigate('/register')}>
+                      <ListItemText primary="Register" />
+                    </ListItemButton>
+                  </ListItem>
+                </>
+              )}
             </List>
           </Box>
         </Drawer>
