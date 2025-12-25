@@ -8,11 +8,24 @@ import {
   TextField,
   Box,
   Grid,
-  IconButton
+  IconButton,
+  Chip,
+  Badge
 } from '@mui/material';
 import { Add as AddIcon, Remove as RemoveIcon } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { addToCart } from '../redux/CartSlice';
 
-const ProductCard = ({ product, quantities, onQuantityChange, onAddToCart }) => {
+const ProductCard = ({ product, quantities, onQuantityChange }) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { items } = useSelector((state) => state.cart || {});
+  
+  // Find if this product is in cart and get quantity
+  const cartItem = items.find(item => item.product._id === product._id);
+  const cartQuantity = cartItem ? cartItem.quantity : 0;
+  
   const getProductImageUrl = (product) => {
     if (product.images && product.images.length > 0) {
       // Find thumbnail first, or use first image
@@ -20,6 +33,15 @@ const ProductCard = ({ product, quantities, onQuantityChange, onAddToCart }) => 
       return thumbnail.cloudinary_url || '/api/placeholder/200/200';
     }
     return '/api/placeholder/200/200';
+  };
+
+  const handleProductClick = () => {
+    navigate(`/product/${product._id}`);
+  };
+
+  const handleAddToCart = () => {
+    const quantity = quantities[product._id] || 1;
+    dispatch(addToCart({ product, quantity }));
   };
 
   return (
@@ -40,6 +62,25 @@ const ProductCard = ({ product, quantities, onQuantityChange, onAddToCart }) => 
       backgroundColor: '#fff',
       overflow: 'hidden'
     }}>
+      {/* Cart Badge */}
+      {cartQuantity > 0 && (
+        <Chip
+          label={`${cartQuantity} in cart`}
+          size="small"
+          sx={{
+            position: 'absolute',
+            top: 10,
+            left: 10,
+            backgroundColor: '#4caf50',
+            color: 'white',
+            fontSize: '10px',
+            fontWeight: 600,
+            zIndex: 2,
+            height: '20px'
+          }}
+        />
+      )}
+
       {/* Promotion Banner */}
         {/* <Box sx={{
           position: 'absolute',
@@ -59,16 +100,20 @@ const ProductCard = ({ product, quantities, onQuantityChange, onAddToCart }) => 
         </Box> */}
 
         {/* Fixed Image Container */}
-        <Box sx={{
-          width: '100%',
-          height: 220,
-          overflow: 'hidden',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: '#fafafa',
-          borderBottom: '1px solid #f0f0f0'
-        }}>
+        <Box 
+          sx={{
+            width: '100%',
+            height: 220,
+            overflow: 'hidden',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#fafafa',
+            borderBottom: '1px solid #f0f0f0',
+            cursor: 'pointer'
+          }}
+          onClick={handleProductClick}
+        >
           <CardMedia
             component="img"
             sx={{
@@ -163,58 +208,95 @@ const ProductCard = ({ product, quantities, onQuantityChange, onAddToCart }) => 
             gap: 1,
             mt: 'auto'
           }}>
-            {/* Quantity Input */}
-            <TextField
-              size="small"
-              type="number"
-              value={quantities[product._id] || 1}
-              onChange={(e) => {
-                const value = parseInt(e.target.value) || 1;
-                const clampedValue = Math.max(1, Math.min(value, product.current_stock));
-                onQuantityChange(product._id, clampedValue);
-              }}
-              inputProps={{ 
-                min: 1,
-                max: product.current_stock,
-                style: { 
-                  textAlign: 'center',
-                  fontSize: '0.8rem'
-                }
-              }}
-              sx={{
-                width: 70,
-                '& .MuiOutlinedInput-root': {
-                  height: 36,
-                  borderRadius: 1
-                }
-              }}
-            />
+            {product.current_stock === 0 ? (
+              // Out of Stock Button - Full Width
+              <Button 
+                variant="contained"
+                size="small"
+                disabled
+                fullWidth
+                sx={{ 
+                  fontSize: '0.7rem',
+                  fontWeight: 'bold',
+                  py: 1,
+                  height: 20,
+                  backgroundColor: '#572929ff',
+                  borderRadius: 1,
+                  textTransform: 'uppercase',
+                  color: '#666',
+                  cursor: 'not-allowed',
+                  '&:disabled': {
+                    backgroundColor: '#721a1aff',
+                    color: '#ece7e7ff'
+                  }
+                }}
+              >
+                OUT OF STOCK
+              </Button>
+            ) : (
+              // In Stock - Quantity Input + Add Button
+              <>
+                <TextField
+                  size="small"
+                  type="number"
+                  value={quantities[product._id] || 1}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Allow empty string for editing
+                    if (value === '' || value === '0') {
+                      onQuantityChange(product._id, '');
+                      return;
+                    }
+                    const numValue = parseInt(value) || 1;
+                    const clampedValue = Math.max(1, Math.min(numValue, product.current_stock));
+                    onQuantityChange(product._id, clampedValue);
+                  }}
+                  onBlur={(e) => {
+                    // When user leaves the field, ensure minimum value of 1
+                    const currentValue = quantities[product._id];
+                    if (currentValue === '' || currentValue < 1) {
+                      onQuantityChange(product._id, 1);
+                    }
+                  }}
+                  inputProps={{ 
+                    min: 1,
+                    max: product.current_stock,
+                    style: { 
+                      textAlign: 'center',
+                      fontSize: '0.8rem'
+                    }
+                  }}
+                  sx={{
+                    width: 70,
+                    '& .MuiOutlinedInput-root': {
+                      height: 20,
+                      borderRadius: 1
+                    }
+                  }}
+                />
 
-            {/* Add Button */}
-            <Button 
-              variant="contained"
-              size="small"
-              onClick={() => onAddToCart(product._id)}
-              disabled={product.current_stock === 0}
-              sx={{ 
-                flexGrow: 1,
-                fontSize: '0.75rem',
-                fontWeight: 'bold',
-                py: 1,
-                height: 36,
-                backgroundColor: '#d32f2f',
-                borderRadius: 1,
-                textTransform: 'uppercase',
-                '&:hover': {
-                  backgroundColor: '#b71c1c'
-                },
-                '&:disabled': {
-                  backgroundColor: '#ccc'
-                }
-              }}
-            >
-              {product.current_stock === 0 ? 'OUT OF STOCK' : 'ADD'}
-            </Button>
+                <Button 
+                  variant="contained"
+                  size="small"
+                  onClick={handleAddToCart}
+                  sx={{ 
+                    flexGrow: 1,
+                    fontSize: '0.75rem',
+                    fontWeight: 'bold',
+                    py: 1,
+                    height: 20,
+                    backgroundColor: '#2c3e50',
+                    borderRadius: 1,
+                    textTransform: 'uppercase',
+                    '&:hover': {
+                      backgroundColor: '#131f2fff',
+                    }
+                  }}
+                >
+                  ADD
+                </Button>
+              </>
+            )}
           </Box>
         </CardContent>
       </Card>

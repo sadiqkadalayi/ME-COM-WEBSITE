@@ -16,6 +16,9 @@ const LoginPage = () => {
   const { loading, error, success, user } = useSelector((state) => state.login || {});
   const [openSnackbar, setOpenSnackbar] = useState(false);
 
+  // Check if user came from cart page
+  const fromCart = new URLSearchParams(window.location.search).get('from') === 'cart';
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -45,10 +48,15 @@ const LoginPage = () => {
     if (success) {
       setOpenSnackbar(true);
       setTimeout(() => {
-        navigate('/'); // Navigate without resetting login state
+        // If user came from cart, redirect back to cart, otherwise go to home
+        if (fromCart) {
+          navigate('/cart');
+        } else {
+          navigate('/');
+        }
       }, 1500);
     }
-  }, [success, navigate]);
+  }, [success, fromCart, navigate]);
 
   useEffect(() => {
     if (error) {

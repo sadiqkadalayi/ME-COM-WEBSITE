@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../redux/LoginSlice';
 import { fetchNavigationCategories } from '../redux/NavigationCategoriesSlice';
-import { AppBar, Toolbar, Typography, Box, Button, IconButton, Container, Grid, Drawer, List, ListItem, ListItemButton, ListItemText, Menu, MenuItem, Collapse } from '@mui/material';
+import { AppBar, Toolbar, Typography, Box, Button, IconButton, Container, Grid, Drawer, List, ListItem, ListItemButton, ListItemText, Menu, MenuItem, Collapse, Badge } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -26,6 +26,7 @@ const Header = () => {
   const dispatch = useDispatch();
   const { user, token } = useSelector((state) => state.login || {});
   const { categories: navCategories, loading: categoriesLoading } = useSelector((state) => state.navigationCategories || {});
+  const { totalItems } = useSelector((state) => state.cart || {});
   
   // Check if user is logged in
   const isLoggedIn = Boolean(user || token);
@@ -391,8 +392,24 @@ const Header = () => {
                     </>
                   )}
                 </Typography>
-                <IconButton color="inherit" sx={{ ml: 1,mr: 4 }}>
-                  <ShoppingCartIcon />
+                <IconButton 
+                  color="inherit" 
+                  sx={{ ml: 1, mr: 4 }}
+                  onClick={() => navigate('/cart')}
+                >
+                  <Badge 
+                    badgeContent={totalItems} 
+                    color="error"
+                    sx={{
+                      '& .MuiBadge-badge': {
+                        fontSize: '10px',
+                        height: '18px',
+                        minWidth: '18px'
+                      }
+                    }}
+                  >
+                    <ShoppingCartIcon />
+                  </Badge>
                 </IconButton>
               </Box>
             </Box>

@@ -23,9 +23,12 @@ const RegisterPage = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error, success } = useSelector((state) => state.register || {});
+  const { loading, error, success, autoLoginSuccess } = useSelector((state) => state.register || {});
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [passwordError, setPasswordError] = useState('');
+
+  // Check if user came from cart page
+  const fromCart = new URLSearchParams(window.location.search).get('from') === 'cart';
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -60,10 +63,25 @@ const RegisterPage = () => {
       setOpenSnackbar(true);
       setTimeout(() => {
         dispatch(resetRegisterState());
-        navigate('/login');
+        
+        if (autoLoginSuccess) {
+          // If auto-login successful and came from cart, redirect to cart
+          if (fromCart) {
+            navigate('/cart');
+          } else {
+            navigate('/');
+          }
+        } else {
+          // If auto-login failed, redirect to login with cart context
+          if (fromCart) {
+            navigate('/login?from=cart');
+          } else {
+            navigate('/login');
+          }
+        }
       }, 1800);
     }
-  }, [success, dispatch, navigate]);
+  }, [success, autoLoginSuccess, fromCart, dispatch, navigate]);
 
   return (
     <Box sx={{ minHeight: '80vh', pt: 6, bgcolor: '#fafbfc', display: 'flex', alignItems: 'flex-start', justifyContent: 'center' }}>
@@ -93,7 +111,10 @@ const RegisterPage = () => {
             )}
             <Snackbar open={openSnackbar && success} autoHideDuration={1800} onClose={() => setOpenSnackbar(false)} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
               <Alert severity="success" sx={{ width: '100%' }}>
-                Registration successful! Redirecting to login...
+                {autoLoginSuccess 
+                  ? 'Registration successful! You are now logged in.' 
+                  : 'Registration successful! Redirecting to login...'
+                }
               </Alert>
             </Snackbar>
             <Grid container spacing={2} alignItems="flex-start" sx={{ rowGap: 1.5, columnGap: 2 }}>

@@ -3,13 +3,31 @@ import axios from 'axios';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL ;
 
-// Async thunk for user registration
+// Async thunk for user registration with auto-login
 export const registerUser = createAsyncThunk(
   'register/registerUser',
   async (userData, { rejectWithValue }) => {
     try {
       // Use environment variable for API base URL
       const response = await axios.post(`${API_BASE_URL}/api/fv1/auth/register`, userData);
+      
+      // If registration successful, automatically login
+      if (response.data.success) {
+        try {
+          const loginResponse = await axios.post(`${API_BASE_URL}/api/fv1/auth/login`, {
+            email: userData.email,
+            password: userData.password
+          });
+          return {
+            ...response.data,
+            autoLogin: loginResponse.data
+          };
+        } catch (loginError) {
+          // Registration successful but login failed, return registration data
+          return response.data;
+        }
+      }
+      
       return response.data;
     } catch (error) {
       let errMsg = 'Registration failed';
@@ -40,6 +58,7 @@ const registerSlice = createSlice({
     user: null,
     error: null,
     success: false,
+    autoLoginSuccess: false,
   },
   reducers: {
     resetRegisterState: (state) => {
@@ -47,6 +66,7 @@ const registerSlice = createSlice({
       state.user = null;
       state.error = null;
       state.success = false;
+      state.autoLoginSuccess = false;
     },
   },
   extraReducers: (builder) => {
@@ -55,16 +75,26 @@ const registerSlice = createSlice({
         state.loading = true;
         state.error = null;
         state.success = false;
+        state.autoLoginSuccess = false;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload;
+        state.user = action.payload.user || action.payload;
         state.success = true;
+        
+        // Handle auto-login if successful
+        if (action.payload.autoLogin) {
+          state.autoLoginSuccess = true;
+          // Store token and user for auto-login
+          localStorage.setItem('me-token', action.payload.autoLogin.token);
+          localStorage.setItem('me-user', JSON.stringify(action.payload.autoLogin.user));
+        }
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Registration failed';
         state.success = false;
+        state.autoLoginSuccess = false;
       });
   },
 });

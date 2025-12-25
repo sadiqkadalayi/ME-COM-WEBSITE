@@ -2,6 +2,7 @@ import { Provider } from 'react-redux';
 import { store } from './store/store';
 import Footer from './components/Footer';
 import Header from './components/Header';
+import ScrollToTop from './components/ScrollToTop';
 import AppRouter from './AppRouter';
 import { BrowserRouter } from 'react-router-dom';
 import SearchBar from './components/SearchBar';
@@ -24,6 +25,7 @@ function App() {
     <Provider store={store}>
       <ThemeProvider theme={compactTheme}>
         <BrowserRouter>
+          <ScrollToTop />
           <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1200 }}>
               <Header />

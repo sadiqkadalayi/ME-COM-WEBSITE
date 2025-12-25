@@ -29,6 +29,7 @@ const HomePage = () => {
 
   // Fetch categories and homepage products
   useEffect(() => {
+    window.scrollTo(0, 0);
     dispatch(fetchNavigationCategories());
     dispatch(fetchHomepageProducts());
   }, [dispatch]);
@@ -36,17 +37,20 @@ const HomePage = () => {
 
 
   const handleQuantityChange = (productId, value) => {
+    // Allow empty string for editing
+    if (value === '' || value === '0') {
+      setQuantities(prev => ({
+        ...prev,
+        [productId]: ''
+      }));
+      return;
+    }
+    
     const qty = Math.max(1, parseInt(value) || 1);
     setQuantities(prev => ({
       ...prev,
       [productId]: qty
     }));
-  };
-
-  const handleAddToCart = (productId) => {
-    const quantity = quantities[productId] || 1;
-    console.log(`Added ${quantity} of product ${productId} to cart`);
-    // TODO: Implement add to cart functionality
   };
 
   const handleShowMore = (categorySlug) => {
@@ -163,7 +167,6 @@ const HomePage = () => {
                       product={product}
                       quantities={quantities}
                       onQuantityChange={handleQuantityChange}
-                      onAddToCart={handleAddToCart}
                     />
                   </Box>
                 ))}

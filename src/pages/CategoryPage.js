@@ -27,6 +27,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchCategoryProducts } from '../redux/ProductsSlice';
 import ProductCard from '../components/ProductCard';
+import CategorySidebar from '../components/CategorySidebar';
 import HomeIcon from '@mui/icons-material/Home';
 
 const CategoryPage = () => {
@@ -37,6 +38,11 @@ const CategoryPage = () => {
   const { categoryProducts, categoryLoading, categoryError, currentCategory, pagination } = useSelector((state) => state.products || {});
   const { categories: navCategories } = useSelector((state) => state.navigationCategories || {});
   
+  // Safety checks for Redux state
+  const safeProducts = categoryProducts || [];
+  const safePagination = pagination || { total_products: 0, total_pages: 1, current_page: 1 };
+  const safeCurrentCategory = currentCategory || { name: 'Category' };
+  
   // Pagination and display states
   const [page, setPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(12); // 6 cards x 2 rows = 12
@@ -44,27 +50,15 @@ const CategoryPage = () => {
   
   // Filter states
   const [filters, setFilters] = useState({
-    priceRange: [0, 1000],
     brands: [],
+    colors: [],
+    priceRange: [0, 1000],
     sortBy: 'best-selling'
   });
-  
-  // Sample filter data (you can fetch this from backend)
-  const priceRanges = [
-    { label: 'QR0.00 - QR25.00', min: 0, max: 25 },
-    { label: 'QR25.00 - QR50.00', min: 25, max: 50 },
-    { label: 'QR50.00 - QR75.00', min: 50, max: 75 },
-    { label: 'QR75.00 - QR100.00', min: 75, max: 100 },
-    { label: 'QR100.00 - QR250.00', min: 100, max: 250 },
-    { label: 'QR250.00+', min: 250, max: 999999 }
-  ];
-  
-  const brands = [
-    'dept store', 'Vegetable', 'Nivea', 'Dove', 'Fruit', 'Gillan', 'Gaepia', 'Baladna'
-  ];
 
-  // Fetch category products
+  // Fetch category products and scroll to top
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (categorySlug) {
       dispatch(fetchCategoryProducts(categorySlug));
     }
@@ -72,17 +66,20 @@ const CategoryPage = () => {
 
   // Handle quantity changes
   const handleQuantityChange = (productId, value) => {
+    // Allow empty string for editing
+    if (value === '' || value === '0') {
+      setQuantities(prev => ({
+        ...prev,
+        [productId]: ''
+      }));
+      return;
+    }
+    
     const qty = Math.max(1, parseInt(value) || 1);
     setQuantities(prev => ({
       ...prev,
       [productId]: qty
     }));
-  };
-
-  const handleAddToCart = (productId) => {
-    const quantity = quantities[productId] || 1;
-    console.log(`Added ${quantity} of product ${productId} to cart`);
-    // TODO: Implement add to cart functionality
   };
 
   // Handle pagination
@@ -97,26 +94,15 @@ const CategoryPage = () => {
   };
 
   // Filter handlers
-  const handlePriceRangeChange = (range) => {
-    setFilters(prev => ({
-      ...prev,
-      priceRange: [range.min, range.max]
-    }));
-  };
-
-  const handleBrandChange = (brand, checked) => {
-    setFilters(prev => ({
-      ...prev,
-      brands: checked 
-        ? [...prev.brands, brand]
-        : prev.brands.filter(b => b !== brand)
-    }));
+  const handleFiltersChange = (newFilters) => {
+    setFilters(newFilters);
+    // TODO: Apply filters to product list
   };
 
   // Calculate pagination - use backend pagination
-  const totalProducts = pagination?.total_products || 0;
-  const totalPages = pagination?.total_pages || 1;
-  const currentProducts = categoryProducts || [];
+  const totalProducts = safePagination.total_products || 0;
+  const totalPages = safePagination.total_pages || 1;
+  const currentProducts = safeProducts || [];
 
   if (categoryLoading) {
     return (
@@ -141,7 +127,7 @@ const CategoryPage = () => {
   }
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 2, pb: 4 }}>
+    <Container maxWidth="xl" sx={{ mt: 5, pb: 4 }}>
       {/* Breadcrumbs */}
       <Box sx={{ mb: 3 }}>
         <Breadcrumbs aria-label="breadcrumb">
@@ -151,88 +137,33 @@ const CategoryPage = () => {
             onClick={() => navigate('/')}
           >
             <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" />
-            HOME
+            Home
           </Link>
           <Link underline="hover" sx={{ cursor: 'pointer' }}>
-            SPECIAL PROMOTION
+            Category
           </Link>
           <Typography color="text.primary">
-            {currentCategory?.name || 'Category'}
+            {safeCurrentCategory.name || 'Category'}
           </Typography>
         </Breadcrumbs>
       </Box>
 
       {/* Page Title */}
-      <Typography variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
-        {currentCategory?.name || 'Products'} ({totalProducts})
+      <Typography variant="h5" sx={{ mb: 3, fontWeight: 400 }}>
+        {safeCurrentCategory.name || 'Products'} ({totalProducts})
       </Typography>
 
       <Grid container spacing={3}>
         {/* Left Sidebar - Filters */}
-        <Grid item xs={12} md={3}>
-          <Card sx={{ p: 2, mb: 2 }}>
-            {/* Shop by Price */}
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" sx={{ 
-                backgroundColor: '#8b1538', 
-                color: 'white', 
-                p: 1, 
-                mb: 2, 
-                fontWeight: 'bold',
-                textAlign: 'center'
-              }}>
-                SHOP BY PRICE
-              </Typography>
-              <FormGroup>
-                {priceRanges.map((range, index) => (
-                  <FormControlLabel
-                    key={index}
-                    control={
-                      <Checkbox 
-                        size="small"
-                        onChange={(e) => handlePriceRangeChange(range)}
-                      />
-                    }
-                    label={<Typography variant="body2">{range.label}</Typography>}
-                  />
-                ))}
-              </FormGroup>
-            </Box>
-
-            <Divider sx={{ my: 2 }} />
-
-            {/* Popular Brands */}
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" sx={{ 
-                backgroundColor: '#8b1538', 
-                color: 'white', 
-                p: 1, 
-                mb: 2, 
-                fontWeight: 'bold',
-                textAlign: 'center'
-              }}>
-                POPULAR BRANDS
-              </Typography>
-              <FormGroup>
-                {brands.map((brand, index) => (
-                  <FormControlLabel
-                    key={index}
-                    control={
-                      <Checkbox 
-                        size="small"
-                        onChange={(e) => handleBrandChange(brand, e.target.checked)}
-                      />
-                    }
-                    label={<Typography variant="body2">{brand}</Typography>}
-                  />
-                ))}
-              </FormGroup>
-            </Box>
-          </Card>
+        <Grid size={{ xs: 12, md: 3 }}>
+          <CategorySidebar 
+            filters={filters}
+            onFiltersChange={handleFiltersChange}
+          />
         </Grid>
 
         {/* Right Content - Products */}
-        <Grid item xs={12} md={9}>
+        <Grid size={{ xs: 12, md: 9 }}>
           {/* Sort and Items per page controls */}
           <Box sx={{ 
             display: 'flex', 
@@ -242,31 +173,47 @@ const CategoryPage = () => {
             flexWrap: 'wrap',
             gap: 2
           }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Typography variant="body2">Sort By:</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2}}>
+              <Typography variant="body2" sx={{ fontSize: 11 }}>Sort By:</Typography>
               <FormControl size="small" sx={{ minWidth: 150 }}>
                 <Select
                   value={filters.sortBy}
                   onChange={(e) => setFilters(prev => ({ ...prev, sortBy: e.target.value }))}
+                  MenuProps={{
+                    disableScrollLock: true,
+                    PaperProps: {
+                      style: {
+                        maxHeight: 200,
+                      },
+                    },
+                  }}
                 >
-                  <MenuItem value="best-selling">Best Selling</MenuItem>
-                  <MenuItem value="price-low-high">Price: Low to High</MenuItem>
-                  <MenuItem value="price-high-low">Price: High to Low</MenuItem>
-                  <MenuItem value="newest">Newest</MenuItem>
+                  <MenuItem value="best-selling" sx={{ fontSize: 11 }}>Best Selling</MenuItem>
+                  <MenuItem value="price-low-high" sx={{ fontSize: 11 }}>Price: Low to High</MenuItem>
+                  <MenuItem value="price-high-low" sx={{ fontSize: 11 }}>Price: High to Low</MenuItem>
+                  <MenuItem value="newest" sx={{ fontSize: 11 }}>Newest</MenuItem>
                 </Select>
               </FormControl>
             </Box>
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Typography variant="body2">Products Per Page:</Typography>
+              <Typography variant="body2" sx={{ fontSize: 11 }}>Products Per Page:</Typography>
               <FormControl size="small">
                 <Select
                   value={itemsPerPage}
                   onChange={handleItemsPerPageChange}
+                  MenuProps={{
+                    disableScrollLock: true,
+                    PaperProps: {
+                      style: {
+                        maxHeight: 200,
+                      },
+                    },
+                  }}
                 >
-                  <MenuItem value={12}>12</MenuItem>
-                  <MenuItem value={24}>24</MenuItem>
-                  <MenuItem value={36}>36</MenuItem>
+                  <MenuItem value={12} sx={{ fontSize: 11 }}>12</MenuItem>
+                  <MenuItem value={24} sx={{ fontSize: 11 }}>24</MenuItem>
+                  <MenuItem value={36} sx={{ fontSize: 11 }}>36</MenuItem>
                 </Select>
               </FormControl>
             </Box>
@@ -276,12 +223,11 @@ const CategoryPage = () => {
           {currentProducts.length > 0 ? (
             <Grid container spacing={2} sx={{ mb: 4 }}>
               {currentProducts.map((product) => (
-                <Grid item xs={6} sm={4} md={2} key={product._id}>
+                <Grid size={{ xs: 6, sm: 4, md: 2 }} key={product._id}>
                   <ProductCard
                     product={product}
                     quantities={quantities}
                     onQuantityChange={handleQuantityChange}
-                    onAddToCart={() => handleAddToCart(product._id)}
                   />
                 </Grid>
               ))}
@@ -313,7 +259,7 @@ const CategoryPage = () => {
                 showLastButton
               />
               <Typography variant="body2" sx={{ ml: 2 }}>
-                Page {pagination?.current_page || 1} of {totalPages} ({totalProducts} total items)
+                Page {safePagination.current_page || 1} of {totalPages} ({totalProducts} total items)
               </Typography>
             </Box>
           )}
