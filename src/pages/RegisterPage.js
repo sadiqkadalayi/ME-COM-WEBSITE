@@ -1,7 +1,9 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { Box, Card, CardContent, Typography, TextField, Button, Grid, InputLabel, Snackbar, Alert } from '@mui/material';
+import { Box, Card, CardContent, Typography, TextField, Button, Grid, InputLabel, Snackbar, Alert, IconButton, InputAdornment } from '@mui/material';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerUser, resetRegisterState } from '../redux/registerSlice';
 import { useNavigate } from 'react-router-dom';
@@ -16,6 +18,8 @@ const RegisterPage = () => {
     password: '',
     confirmPassword: '',
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -25,6 +29,14 @@ const RegisterPage = () => {
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleToggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
   };
 
   const handleSubmit = (e) => {
@@ -105,14 +117,58 @@ const RegisterPage = () => {
               </Grid>
               <Grid item xs={12} md={6} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
                 <InputLabel required sx={{ fontSize: 11 }}>Password</InputLabel>
-                <TextField name="password" value={form.password} onChange={handleChange} placeholder="Password" type="password" fullWidth size="small" required 
+                <TextField 
+                  name="password" 
+                  value={form.password} 
+                  onChange={handleChange} 
+                  placeholder="Password" 
+                  type={showPassword ? "text" : "password"} 
+                  fullWidth 
+                  size="small" 
+                  required 
                   sx={{ mb: 1.2, '& .MuiInputBase-input': { py: 0.8, fontSize: 11 }, '& .MuiInputLabel-root': { fontSize: 11 } }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={handleTogglePasswordVisibility}
+                          edge="end"
+                          size="small"
+                          sx={{ color: '#666' }}
+                        >
+                          {showPassword ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </Grid>
               <Grid item xs={12} md={6} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
                 <InputLabel required sx={{ fontSize: 11 }}>Confirm Password</InputLabel>
-                <TextField name="confirmPassword" value={form.confirmPassword} onChange={handleChange} placeholder="Confirm Password" type="password" fullWidth size="small" required 
+                <TextField 
+                  name="confirmPassword" 
+                  value={form.confirmPassword} 
+                  onChange={handleChange} 
+                  placeholder="Confirm Password" 
+                  type={showConfirmPassword ? "text" : "password"} 
+                  fullWidth 
+                  size="small" 
+                  required 
                   sx={{ mb: 1.2, '& .MuiInputBase-input': { py: 0.8, fontSize: 11 }, '& .MuiInputLabel-root': { fontSize: 11 } }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={handleToggleConfirmPasswordVisibility}
+                          edge="end"
+                          size="small"
+                          sx={{ color: '#666' }}
+                        >
+                          {showConfirmPassword ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </Grid>
             </Grid>

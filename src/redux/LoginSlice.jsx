@@ -37,8 +37,8 @@ const loginSlice = createSlice({
   name: 'login',
   initialState: {
     loading: false,
-    user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null,
-    token: localStorage.getItem('token') || null,
+    user: localStorage.getItem('me-user') ? JSON.parse(localStorage.getItem('me-user')) : null,
+    token: localStorage.getItem('me-token') || null,
     error: null,
     success: false,
   },
@@ -54,8 +54,8 @@ const loginSlice = createSlice({
       state.error = null;
       state.success = false;
       // Remove both token and user from localStorage
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      localStorage.removeItem('me-token');
+      localStorage.removeItem('me-user');
     },
     logout: (state) => {
       state.user = null;
@@ -63,8 +63,8 @@ const loginSlice = createSlice({
       state.success = false;
       state.error = null;
       // Remove both token and user from localStorage
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      localStorage.removeItem('me-token');
+      localStorage.removeItem('me-user');
     },
   },
   extraReducers: (builder) => {
@@ -81,8 +81,8 @@ const loginSlice = createSlice({
         state.token = action.payload.token;
         state.success = true;
         // Store both token and user in localStorage
-        localStorage.setItem('token', action.payload.token);
-        localStorage.setItem('user', JSON.stringify(action.payload.user));
+        localStorage.setItem('me-token', action.payload.token);
+        localStorage.setItem('me-user', JSON.stringify(action.payload.user));
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;

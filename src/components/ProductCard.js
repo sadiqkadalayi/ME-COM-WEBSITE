@@ -1,0 +1,224 @@
+import React from 'react';
+import {
+  Card,
+  CardMedia,
+  CardContent,
+  Typography,
+  Button,
+  TextField,
+  Box,
+  Grid,
+  IconButton
+} from '@mui/material';
+import { Add as AddIcon, Remove as RemoveIcon } from '@mui/icons-material';
+
+const ProductCard = ({ product, quantities, onQuantityChange, onAddToCart }) => {
+  const getProductImageUrl = (product) => {
+    if (product.images && product.images.length > 0) {
+      // Find thumbnail first, or use first image
+      const thumbnail = product.images.find(img => img.is_thumbnail) || product.images[0];
+      return thumbnail.cloudinary_url || '/api/placeholder/200/200';
+    }
+    return '/api/placeholder/200/200';
+  };
+
+  return (
+    <Card sx={{ 
+      position: 'relative',
+      width: '100%',
+      height: 450,
+      display: 'flex',
+      flexDirection: 'column',
+      boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+      '&:hover': {
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+        transform: 'translateY(-2px)'
+      },
+      transition: 'all 0.3s ease',
+      border: '1px solid #e5e5e5',
+      borderRadius: 2,
+      backgroundColor: '#fff',
+      overflow: 'hidden'
+    }}>
+      {/* Promotion Banner */}
+        {/* <Box sx={{
+          position: 'absolute',
+          top: 10,
+          left: 10,
+          backgroundColor: '#FFD700',
+          color: '#000',
+          px: 1.5,
+          py: 0.5,
+          fontSize: '0.65rem',
+          fontWeight: 'bold',
+          borderRadius: 0.5,
+          zIndex: 2,
+          textTransform: 'uppercase'
+        }}>
+          X-Mas Promotion
+        </Box> */}
+
+        {/* Fixed Image Container */}
+        <Box sx={{
+          width: '100%',
+          height: 220,
+          overflow: 'hidden',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#fafafa',
+          borderBottom: '1px solid #f0f0f0'
+        }}>
+          <CardMedia
+            component="img"
+            sx={{
+              width: '90%',
+              height: '90%',
+              objectFit: 'contain',
+              padding: 2
+            }}
+            image={getProductImageUrl(product)}
+            alt={product.product_name}
+          />
+        </Box>
+
+        <CardContent sx={{ 
+          flexGrow: 1, 
+          display: 'flex',
+          flexDirection: 'column',
+          p: 2,
+          pb: 1,
+          '&:last-child': { pb: 1 }
+        }}>
+          {/* SKU */}
+          <Typography 
+            variant="caption"
+            sx={{ 
+              color: '#666',
+              fontSize: '0.7rem',
+              mb: 0.5,
+              fontWeight: 500,
+              textTransform: 'uppercase'
+            }}
+          >
+            {product.sku}
+          </Typography>
+
+          {/* Product Name */}
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              mb: 1,
+              fontSize: '0.8rem',
+              lineHeight: 1.2,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              minHeight: 32,
+              maxHeight: 32,
+              fontWeight: 500,
+              color: '#333',
+              wordBreak: 'break-word',
+              textOverflow: 'ellipsis'
+            }}
+          >
+            {product.product_name}
+          </Typography>
+          
+          {/* Brand */}
+          <Typography 
+            variant="caption"
+            sx={{ 
+              color: '#888',
+              fontSize: '0.7rem',
+              mb: 1,
+              textTransform: 'uppercase',
+              fontWeight: 500
+            }}
+          >
+            {product.brand}
+          </Typography>
+
+          {/* Price */}
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              color: '#d32f2f',
+              fontWeight: 700,
+              fontSize: '1rem',
+              mb: 2
+            }}
+          >
+            QR{product.price.toFixed(2)}
+          </Typography>
+
+          {/* Spacer */}
+          <Box sx={{ flexGrow: 1 }} />
+
+          {/* Quantity and Add Button */}
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 1,
+            mt: 'auto'
+          }}>
+            {/* Quantity Input */}
+            <TextField
+              size="small"
+              type="number"
+              value={quantities[product._id] || 1}
+              onChange={(e) => {
+                const value = parseInt(e.target.value) || 1;
+                const clampedValue = Math.max(1, Math.min(value, product.current_stock));
+                onQuantityChange(product._id, clampedValue);
+              }}
+              inputProps={{ 
+                min: 1,
+                max: product.current_stock,
+                style: { 
+                  textAlign: 'center',
+                  fontSize: '0.8rem'
+                }
+              }}
+              sx={{
+                width: 70,
+                '& .MuiOutlinedInput-root': {
+                  height: 36,
+                  borderRadius: 1
+                }
+              }}
+            />
+
+            {/* Add Button */}
+            <Button 
+              variant="contained"
+              size="small"
+              onClick={() => onAddToCart(product._id)}
+              disabled={product.current_stock === 0}
+              sx={{ 
+                flexGrow: 1,
+                fontSize: '0.75rem',
+                fontWeight: 'bold',
+                py: 1,
+                height: 36,
+                backgroundColor: '#d32f2f',
+                borderRadius: 1,
+                textTransform: 'uppercase',
+                '&:hover': {
+                  backgroundColor: '#b71c1c'
+                },
+                '&:disabled': {
+                  backgroundColor: '#ccc'
+                }
+              }}
+            >
+              {product.current_stock === 0 ? 'OUT OF STOCK' : 'ADD'}
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
+  );
+};
+
+export default ProductCard;

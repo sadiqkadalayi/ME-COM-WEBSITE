@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Card, CardContent, Typography, TextField, Button, Grid, Link, Divider, List, ListItem, ListItemIcon, ListItemText, Snackbar, Alert } from '@mui/material';
+import { Box, Card, CardContent, Typography, TextField, Button, Grid, Link, Divider, List, ListItem, ListItemIcon, ListItemText, Snackbar, Alert, IconButton, InputAdornment } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser, clearError } from '../redux/LoginSlice';
@@ -8,6 +10,7 @@ import { loginUser, clearError } from '../redux/LoginSlice';
 
 const LoginPage = () => {
   const [form, setForm] = useState({ email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { loading, error, success, user } = useSelector((state) => state.login || {});
@@ -15,6 +18,10 @@ const LoginPage = () => {
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   const handleSubmit = (e) => {
@@ -38,7 +45,7 @@ const LoginPage = () => {
     if (success) {
       setOpenSnackbar(true);
       setTimeout(() => {
-        navigate('/dashboard'); // Navigate without resetting login state
+        navigate('/'); // Navigate without resetting login state
       }, 1500);
     }
   }, [success, navigate]);
@@ -94,10 +101,24 @@ const LoginPage = () => {
                 onChange={handleChange}
                 placeholder="Password"
                 variant="outlined"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 fullWidth
                 size="small"
                 sx={{ bgcolor: '#fff', '& .MuiInputBase-input': { py: 0.8, fontSize: 11 }, '& .MuiInputLabel-root': { fontSize: 11 } }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={handleTogglePasswordVisibility}
+                        edge="end"
+                        size="small"
+                        sx={{ color: '#666' }}
+                      >
+                        {showPassword ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
                 <Button
