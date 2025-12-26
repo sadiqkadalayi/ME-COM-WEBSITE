@@ -8,6 +8,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ContactUsPage from './pages/ContactUsPage';
 import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import DashboardPage from './pages/Dashboard/DashboardPage';
 import ProtectedRoute from './utils/ProtectedRoute';
 
@@ -21,6 +22,7 @@ const AppRouter = () => (
     <Route path="/register" element={<RegisterPage />} />
     <Route path="/contact-us" element={<ContactUsPage />} />
     <Route path="/forgot-password" element={<ForgotPassword />} />
+    <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/dashboard" element={
       <ProtectedRoute>
         <DashboardPage />

@@ -48,6 +48,7 @@ const CartPage = () => {
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
   const [orderNumber, setOrderNumber] = useState('');
+  const [customerNotes, setCustomerNotes] = useState('');
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -112,7 +113,7 @@ const CartPage = () => {
           country: 'UAE'
         },
         payment_method: 'cash_on_delivery',
-        customer_notes: 'Order placed from website',
+        customer_notes: customerNotes || 'Order placed from website',
         discount_amount: 0,
         shipping_method: 'standard'
       };
@@ -157,10 +158,9 @@ const CartPage = () => {
     return '/api/placeholder/100/100';
   };
 
-  // Calculate taxes (5% example)
+  // Calculate total without taxes
   const subtotal = totalAmount;
-  const taxes = subtotal * 0.05;
-  const total = subtotal + taxes;
+  const total = subtotal;
 
   if (items.length === 0) {
     return (
@@ -341,12 +341,21 @@ const CartPage = () => {
               </Typography>
             </Box>
 
-            {/* Taxes */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-              <Typography sx={{ fontSize: 12 }}>Taxes</Typography>
-              <Typography sx={{ fontSize: 12, fontWeight: 600 }}>
-                {taxes.toFixed(2)} AED
-              </Typography>
+            {/* Customer Notes */}
+            <Box sx={{ mb: 3 }}>
+              <Typography sx={{ fontSize: 12, fontWeight: 600, mb: 1 }}>Additional Notes</Typography>
+              <TextField
+                fullWidth
+                multiline
+                rows={3}
+                size="small"
+                placeholder="Any special requests or concerns you'd like to share with us..."
+                value={customerNotes}
+                onChange={(e) => setCustomerNotes(e.target.value)}
+                sx={{ 
+                  '& .MuiInputBase-root': { fontSize: 11 }
+                }}
+              />
             </Box>
 
             <Divider sx={{ mb: 3 }} />
