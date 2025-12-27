@@ -133,7 +133,9 @@ const ProductDetailsPage = () => {
   }
 
   const images = getProductImages();
+  const totalPriceForMain = ((product.price || 0) ).toFixed(2);
   const totalPrice = ((product.price || 0) * quantity).toFixed(2);
+
 
   return (
     <Container maxWidth="xl" sx={{ mt: 5, pb: 4 }}>
@@ -292,7 +294,7 @@ const ProductDetailsPage = () => {
           </Box>
 
           <Typography variant="h5" sx={{ color: '#d32f2f', fontWeight: 700, mb: 2 }}>
-            {(product.currency || 'QR')} {totalPrice}
+            {(product.currency || 'QAR')} {totalPriceForMain}
           </Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>

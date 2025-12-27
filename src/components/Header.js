@@ -47,7 +47,7 @@ const Header = () => {
                          event.target.hasAttribute('data-menu-button');
       
       if (!isMenuClick) {
-        console.log('Outside click detected, closing menus'); // Debug log
+       
         handleMenuClose();
       }
     };
@@ -324,7 +324,7 @@ const Header = () => {
               <img 
                 src={Logo} 
                 alt="Logo" 
-                style={{ height: 40, marginRight: 12, marginLeft: 20, cursor: 'pointer' }} 
+                style={{ height: 50, marginRight: 12, marginLeft: 25, cursor: 'pointer' }} 
                 onClick={() => navigate('/')} 
               />
               <Box sx={{ flexGrow: 1 }} />

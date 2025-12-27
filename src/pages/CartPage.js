@@ -314,7 +314,7 @@ const CartPage = () => {
                   {/* Price and Remove */}
                   <Box sx={{ textAlign: 'right', minWidth: 120 }}>
                     <Typography variant="h6" sx={{ fontSize: 14, fontWeight: 600, mb: 1 }}>
-                      {(item.product.price * item.quantity).toFixed(2)} {item.product.currency || 'AED'}
+                      {(item.product.price * item.quantity).toFixed(2)} {item.product.currency || 'QAR'}
                     </Typography>
                     <IconButton 
                       size="small" 
@@ -337,7 +337,7 @@ const CartPage = () => {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
               <Typography sx={{ fontSize: 12 }}>Subtotal</Typography>
               <Typography sx={{ fontSize: 12, fontWeight: 600 }}>
-                {subtotal.toFixed(2)} AED
+                {subtotal.toFixed(2)} QAR
               </Typography>
             </Box>
 
@@ -364,7 +364,7 @@ const CartPage = () => {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
               <Typography sx={{ fontSize: 16, fontWeight: 700 }}>Total</Typography>
               <Typography sx={{ fontSize: 16, fontWeight: 700 }}>
-                {total.toFixed(2)} AED
+                {total.toFixed(2)} QAR
               </Typography>
             </Box>
 
