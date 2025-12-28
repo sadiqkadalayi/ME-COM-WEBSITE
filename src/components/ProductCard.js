@@ -48,7 +48,7 @@ const ProductCard = ({ product, quantities, onQuantityChange }) => {
     <Card sx={{ 
       position: 'relative',
       width: '100%',
-      height: 450,
+      height: 350,
       display: 'flex',
       flexDirection: 'column',
       boxShadow: '0 1px 3px rgba(0,0,0,0.1)',

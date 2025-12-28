@@ -251,33 +251,6 @@ const Header = () => {
                 }
               }}
             >
-              <Box sx={{ 
-                bgcolor: '#f8f9fa', 
-                px: 2, 
-                py: 1, 
-                fontSize: 12,
-                fontWeight: 600,
-                color: '#333',
-                textTransform: 'uppercase'
-              }}>
-                {subcat.name}
-              </Box>
-              <MenuItem 
-                onClick={() => {
-                  navigate(`/category/${subcat.slug}`);
-                  handleMenuClose();
-                }}
-                sx={{ 
-                  py: 1,
-                  px: 2,
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: '#0b3a4a',
-                  borderBottom: '1px solid #f0f0f0'
-                }}
-              >
-                VIEW ALL ({subcat.productCount})
-              </MenuItem>
               {renderNestedItems(subcat.subcategories, level + 1)}
             </Menu>
           )}
@@ -511,40 +484,6 @@ const Header = () => {
                         }
                       }}
                     >
-                      <Box sx={{ 
-                        bgcolor: '#f8f9fa', 
-                        px: 2, 
-                        py: 1.5, 
-                        borderBottom: '1px solid #e0e0e0',
-                        fontSize: 14,
-                        fontWeight: 600,
-                        color: '#333',
-                        textTransform: 'uppercase'
-                      }}>
-                        {category.name}
-                      </Box>
-                      
-                      <MenuItem 
-                        onClick={() => {
-                          navigate(`/category/${category.slug}`);
-                          handleMenuClose();
-                        }}
-                        sx={{ 
-                          py: 1.5,
-                          px: 2,
-                          fontSize: 13,
-                          fontWeight: 600,
-                          color: '#0b3a4a',
-                          borderBottom: '1px solid #f0f0f0',
-                          '&:hover': {
-                            backgroundColor: '#f8f9fa'
-                          }
-                        }}
-                      >
-                        SHOP ALL {category.name.toUpperCase()} ({category.productCount})
-                      </MenuItem>
-                      
-                      
                       {/* Render nested subcategories recursively */}
                       {renderNestedItems(category.subcategories)}
                     </Menu>
