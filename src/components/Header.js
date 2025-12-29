@@ -353,15 +353,6 @@ const Header = () => {
                       >
                         Sign In
                       </Button>
-                      <span style={{ color: '#999' }}>or</span>
-                      <Button 
-                        variant="text" 
-                        size="small"
-                        onClick={() => navigate('/register')}
-                        sx={{ minWidth: 'auto', px: 1, py: 0.5, fontWeight: 500, fontSize: 13, textTransform: 'none', color: '#2f2f30ff', '&:hover': { background: 'transparent', textDecoration: 'underline' } }}
-                      >
-                        Register
-                      </Button>
                     </>
                   )}
                 </Typography>
@@ -624,14 +615,6 @@ const Header = () => {
                       handleDrawerToggle();
                     }}>
                       <ListItemText primary="Sign In" />
-                    </ListItemButton>
-                  </ListItem>
-                  <ListItem disablePadding>
-                    <ListItemButton onClick={() => {
-                      navigate('/register');
-                      handleDrawerToggle();
-                    }}>
-                      <ListItemText primary="Register" />
                     </ListItemButton>
                   </ListItem>
                 </>

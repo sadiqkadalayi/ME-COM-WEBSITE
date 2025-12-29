@@ -185,19 +185,6 @@ const ProductCard = ({ product, quantities, onQuantityChange }) => {
             {product.brand}
           </Typography>
 
-          {/* Price */}
-          <Typography 
-            variant="h6" 
-            sx={{ 
-              color: '#d32f2f',
-              fontWeight: 700,
-              fontSize: '1rem',
-              mb: 2
-            }}
-          >
-            QR{product.price.toFixed(2)}
-          </Typography>
-
           {/* Spacer */}
           <Box sx={{ flexGrow: 1 }} />
 

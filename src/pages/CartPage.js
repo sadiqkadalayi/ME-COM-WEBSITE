@@ -32,7 +32,7 @@ import {
 } from '@mui/icons-material';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { removeFromCart, updateQuantity, clearCart } from '../redux/CartSlice';
+import { removeFromCart, updateQuantity, clearCart, addToCart, addDuplicateToCart } from '../redux/CartSlice';
 import axios from 'axios';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3001';
@@ -44,10 +44,33 @@ const CartPage = () => {
 
   // State for checkout flow
   const [checkoutConfirmOpen, setCheckoutConfirmOpen] = useState(false);
+  const [guestCheckoutOpen, setGuestCheckoutOpen] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
   const [orderNumber, setOrderNumber] = useState('');
+  
+  // Stock notification state
+  const [stockNotification, setStockNotification] = useState({
+    open: false,
+    message: ''
+  });
+
+  // Empty quantity modal state
+  const [emptyQuantityModal, setEmptyQuantityModal] = useState({
+    open: false,
+    itemIndex: null,
+    newQuantity: ''
+  });
+
+  // Guest checkout form data
+  const [guestData, setGuestData] = useState({
+    companyName: '',
+    individualName: '',
+    email: '',
+    mobile: '',
+    countryCode: '+971' // Default UAE
+  });
   const [customerNotes, setCustomerNotes] = useState('');
 
   // Scroll to top when component mounts
@@ -59,13 +82,60 @@ const CartPage = () => {
     return Boolean(localStorage.getItem('me-token'));
   };
 
-  const handleQuantityChange = (productId, newQuantity) => {
+  const handleQuantityChange = (itemIndex, newQuantity) => {
+    // If quantity is empty or 0, show the empty quantity modal
+    if (newQuantity === '' || newQuantity === 0) {
+      setEmptyQuantityModal({
+        open: true,
+        itemIndex: itemIndex,
+        newQuantity: ''
+      });
+      return;
+    }
+
     if (newQuantity < 1) return;
-    dispatch(updateQuantity({ productId, quantity: newQuantity }));
+    
+    // Check if quantity exceeds stock and show notification
+    const item = items[itemIndex];
+    const stockQuantity = item.product.current_stock || 0;
+    
+    if (newQuantity > stockQuantity) {
+      setStockNotification({
+        open: true,
+        message: `You are requesting ${newQuantity} pieces, but we currently have only ${stockQuantity} pieces in stock. We can manufacture additional quantities upon order confirmation.`
+      });
+    }
+    
+    // Get the item and dispatch the Redux action properly
+    dispatch(updateQuantity({ 
+      productId: item.product._id, 
+      quantity: newQuantity, 
+      cartId: item.cartId 
+    }));
   };
 
-  const handleRemoveItem = (productId) => {
-    dispatch(removeFromCart(productId));
+  // Handle confirming quantity from modal
+  const handleConfirmQuantity = () => {
+    const quantity = parseInt(emptyQuantityModal.newQuantity);
+    if (quantity && quantity > 0) {
+      handleQuantityChange(emptyQuantityModal.itemIndex, quantity);
+    }
+    setEmptyQuantityModal({ open: false, itemIndex: null, newQuantity: '' });
+  };
+
+  // Handle removing item from empty quantity modal
+  const handleRemoveFromModal = () => {
+    handleRemoveItem(emptyQuantityModal.itemIndex);
+    setEmptyQuantityModal({ open: false, itemIndex: null, newQuantity: '' });
+  };
+
+  const handleRemoveItem = (itemIndex) => {
+    // Remove by dispatching Redux action with proper identifiers
+    const item = items[itemIndex];
+    dispatch(removeFromCart({ 
+      productId: item.product._id, 
+      cartId: item.cartId 
+    }));
   };
 
   const handleClearCart = () => {
@@ -73,14 +143,13 @@ const CartPage = () => {
   };
 
   const handleCheckout = () => {
-    // Check if user is logged in
-    if (!isUserLoggedIn()) {
-      navigate('/login?from=cart');
-      return;
-    }
+    // Show guest checkout option popup instead of checking login
+    setGuestCheckoutOpen(true);
+  };
 
-    // Show confirmation dialog
-    setCheckoutConfirmOpen(true);
+  const handleDuplicateItem = (product) => {
+    // Add same product as a duplicate entry with quantity 1
+    dispatch(addDuplicateToCart({ product, quantity: 1 }));
   };
 
   const handleCheckoutConfirm = async () => {
@@ -88,51 +157,63 @@ const CartPage = () => {
     setCheckoutLoading(true);
 
     try {
-      // Get user email from localStorage
-      const userData = JSON.parse(localStorage.getItem('me-user') || '{}');
-      const userEmail = userData.email;
-
-      if (!userEmail) {
-        throw new Error('User email not found. Please login again.');
-      }
-
-      // Prepare order data
+      // Prepare complete order data (same structure as before, just with guest info)
       const orderData = {
-        customer_email: userEmail,
-        is_guest_order: false,
+        customer_email: guestData.email,
+        is_guest_order: true,
         items: items.map(item => ({
           product_id: item.product._id,
-          quantity: item.quantity
+          product: item.product,
+          quantity: item.quantity,
+          price: item.product.price || 0,
+          total_price: (item.product.price || 0) * item.quantity
         })),
         shipping_address: {
-          full_name: userData.name || userData.first_name + ' ' + userData.last_name || 'Customer',
-          phone: userData.phone || '123456789',
-          email: userEmail,
-          address_line_1: userData.address || 'Address Line 1',
-          city: userData.city || 'Dubai',
+          full_name: guestData.individualName,
+          company_name: guestData.companyName,
+          phone: `${guestData.countryCode}${guestData.mobile}`,
+          email: guestData.email,
+          address_line_1: guestData.companyName || 'Company Address',
+          city: 'Dubai',
           country: 'UAE'
         },
-        payment_method: 'cash_on_delivery',
-        customer_notes: customerNotes || 'Order placed from website',
+        payment_method: 'enquiry',
+        customer_notes: customerNotes || 'Guest enquiry from website',
         discount_amount: 0,
-        shipping_method: 'standard'
+        shipping_method: 'standard',
+        guestData: guestData
       };
 
-      // Make API call to create order
-      const response = await axios.post(`${API_BASE_URL}/api/fv1/orders/create`, orderData);
+      console.log('🚀 Sending guest enquiry:', orderData);
+
+      const response = await axios.post(`${API_BASE_URL}/api/website/guest-checkout`, orderData);
 
       if (response.data.success) {
         setOrderNumber(response.data.order_number);
+        setCheckoutLoading(false); // Reset loading state
         setCheckoutSuccess(true);
         
-        // Clear cart after successful order
+        // Clear cart after successful enquiry
         dispatch(clearCart());
         
-        // Show success message
+        // Clear guest form
+        setGuestData({
+          companyName: '',
+          individualName: '',
+          email: '',
+          mobile: '',
+          countryCode: '+971'
+        });
+        setCustomerNotes('');
+
+        // Auto redirect after success message
         setTimeout(() => {
           setCheckoutSuccess(false);
           navigate('/');
-        }, 5000);
+        }, 3000);
+      } else {
+        setCheckoutError('Failed to submit enquiry. Please try again.');
+        setCheckoutLoading(false); // Reset loading state on error
       }
     } catch (error) {
       console.error('Checkout error:', error);
@@ -157,10 +238,6 @@ const CartPage = () => {
     }
     return '/api/placeholder/100/100';
   };
-
-  // Calculate total without taxes
-  const subtotal = totalAmount;
-  const total = subtotal;
 
   if (items.length === 0) {
     return (
@@ -249,7 +326,7 @@ const CartPage = () => {
           {/* Cart Items List */}
           <Box sx={{ mb: 4 }}>
             {items.map((item, index) => (
-              <Paper key={item.product._id} sx={{ p: 3, mb: 2, border: '1px solid #e5e5e5' }}>
+              <Paper key={item.cartId || item.product._id + '_' + index} sx={{ p: 3, mb: 2, border: '1px solid #e5e5e5' }}>
                 <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
                   {/* Product Image */}
                   <Card sx={{ width: 80, height: 80, flexShrink: 0 }}>
@@ -280,7 +357,7 @@ const CartPage = () => {
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <IconButton 
                       size="small" 
-                      onClick={() => handleQuantityChange(item.product._id, item.quantity - 1)}
+                      onClick={() => handleQuantityChange(index, item.quantity - 1)}
                       disabled={item.quantity <= 1}
                     >
                       <RemoveIcon fontSize="small" />
@@ -291,35 +368,43 @@ const CartPage = () => {
                       type="number"
                       value={item.quantity}
                       onChange={(e) => {
-                        const value = parseInt(e.target.value) || 1;
-                        handleQuantityChange(item.product._id, value);
+                        const value = e.target.value;
+                        if (value === '') {
+                          handleQuantityChange(index, '');
+                        } else {
+                          const numValue = parseInt(value) || 0;
+                          handleQuantityChange(index, numValue);
+                        }
                       }}
                       inputProps={{ 
                         min: 1,
-                        max: item.product.current_stock || 999,
-                        style: { textAlign: 'center', fontSize: '11px', width: '50px' }
+                        style: { textAlign: 'center', fontSize: '10px', width: '150px' }
                       }}
                       sx={{ width: 60 }}
                     />
                     
                     <IconButton 
                       size="small" 
-                      onClick={() => handleQuantityChange(item.product._id, item.quantity + 1)}
-                      disabled={item.quantity >= (item.product.current_stock || 999)}
+                      onClick={() => handleQuantityChange(index, item.quantity + 1)}
                     >
                       <AddIcon fontSize="small" />
                     </IconButton>
                   </Box>
 
-                  {/* Price and Remove */}
-                  <Box sx={{ textAlign: 'right', minWidth: 120 }}>
-                    <Typography variant="h6" sx={{ fontSize: 14, fontWeight: 600, mb: 1 }}>
-                      {(item.product.price * item.quantity).toFixed(2)} {item.product.currency || 'QAR'}
-                    </Typography>
+                  {/* Duplicate Button and Remove */}
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 120 }}>
+                    <Button 
+                      size="small" 
+                      variant="outlined"
+                      onClick={() => handleDuplicateItem(item.product)}
+                      sx={{ fontSize: '10px', py: 0.5 }}
+                    >
+                      Another Quantity
+                    </Button>
                     <IconButton 
                       size="small" 
                       color="error"
-                      onClick={() => handleRemoveItem(item.product._id)}
+                      onClick={() => handleRemoveItem(index)}
                     >
                       <DeleteIcon fontSize="small" />
                     </IconButton>
@@ -330,14 +415,14 @@ const CartPage = () => {
           </Box>
         </Grid>
 
-        {/* Right Side - Order Summary */}
+        {/* Right Side - Enquiry Summary */}
         <Grid size={{ xs: 12, md: 4 }}>
           <Paper sx={{ p: 3, position: 'sticky', top: 20 }}>
-            {/* Subtotal */}
+            {/* Items Count */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-              <Typography sx={{ fontSize: 12 }}>Subtotal</Typography>
+              <Typography sx={{ fontSize: 12 }}>Total Items</Typography>
               <Typography sx={{ fontSize: 12, fontWeight: 600 }}>
-                {subtotal.toFixed(2)} QAR
+                {totalItems} items
               </Typography>
             </Box>
 
@@ -359,14 +444,6 @@ const CartPage = () => {
             </Box>
 
             <Divider sx={{ mb: 3 }} />
-
-            {/* Total */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-              <Typography sx={{ fontSize: 16, fontWeight: 700 }}>Total</Typography>
-              <Typography sx={{ fontSize: 16, fontWeight: 700 }}>
-                {total.toFixed(2)} QAR
-              </Typography>
-            </Box>
 
             {/* Gift Card / Discount Code */}
             <Box sx={{ mb: 3 }}>
@@ -464,7 +541,7 @@ const CartPage = () => {
             disabled={checkoutLoading}
             sx={{ fontSize: 12 }}
           >
-            {checkoutLoading ? <CircularProgress size={20} /> : 'Proceed to Checkout'}
+            {checkoutLoading ? <CircularProgress size={20} /> : 'Send Enquiry'}
           </Button>
         </DialogActions>
       </Dialog>
@@ -500,6 +577,160 @@ const CartPage = () => {
           {checkoutError}
         </Alert>
       </Snackbar>
+
+      {/* Guest Checkout Modal */}
+      <Dialog open={guestCheckoutOpen} onClose={() => setGuestCheckoutOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Checkout Options</DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ mb: 2 }}>
+            Choose how you'd like to proceed with your enquiry:
+          </DialogContentText>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button 
+              variant="contained" 
+              fullWidth
+              onClick={() => {
+                setGuestCheckoutOpen(false);
+                setCheckoutConfirmOpen(true);
+              }}
+            >
+              Continue as Guest
+            </Button>
+            <Button 
+              variant="outlined" 
+              fullWidth
+              onClick={() => {
+                setGuestCheckoutOpen(false);
+                navigate('/login?from=cart');
+              }}
+            >
+              Sign In
+            </Button>
+          </Box>
+        </DialogContent>
+      </Dialog>
+
+      {/* Guest Form Modal */}
+      <Dialog open={checkoutConfirmOpen} onClose={() => setCheckoutConfirmOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Guest Enquiry Form</DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+            <TextField
+              label="Company Name"
+              fullWidth
+              value={guestData.companyName}
+              onChange={(e) => setGuestData(prev => ({ ...prev, companyName: e.target.value }))}
+              required
+            />
+            <TextField
+              label="Individual Name"
+              fullWidth
+              value={guestData.individualName}
+              onChange={(e) => setGuestData(prev => ({ ...prev, individualName: e.target.value }))}
+              required
+            />
+            <TextField
+              label="Email"
+              type="email"
+              fullWidth
+              value={guestData.email}
+              onChange={(e) => setGuestData(prev => ({ ...prev, email: e.target.value }))}
+              required
+            />
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <TextField
+                label="Country Code"
+                value={guestData.countryCode}
+                onChange={(e) => setGuestData(prev => ({ ...prev, countryCode: e.target.value }))}
+                sx={{ width: 120 }}
+                select
+                SelectProps={{ native: true }}
+              >
+                <option value="+971">+971 (UAE)</option>
+                <option value="+966">+966 (SA)</option>
+                <option value="+965">+965 (KW)</option>
+                <option value="+974">+974 (QA)</option>
+                <option value="+968">+968 (OM)</option>
+                <option value="+973">+973 (BH)</option>
+                <option value="+1">+1 (US)</option>
+                <option value="+44">+44 (UK)</option>
+                <option value="+91">+91 (IN)</option>
+              </TextField>
+              <TextField
+                label="Mobile Number"
+                fullWidth
+                value={guestData.mobile}
+                onChange={(e) => setGuestData(prev => ({ ...prev, mobile: e.target.value }))}
+                required
+              />
+            </Box>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setCheckoutConfirmOpen(false)}>Cancel</Button>
+          <Button 
+            variant="contained" 
+            onClick={handleCheckoutConfirm}
+            disabled={!guestData.companyName || !guestData.individualName || !guestData.email || !guestData.mobile}
+          >
+            Send Enquiry
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Stock Notification */}
+      <Snackbar
+        open={stockNotification.open}
+        autoHideDuration={8000}
+        onClose={() => setStockNotification({ open: false, message: '' })}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert 
+          severity="warning" 
+          onClose={() => setStockNotification({ open: false, message: '' })} 
+          sx={{ width: '100%' }}
+        >
+          <Typography variant="body2" sx={{ fontSize: 13 }}>
+            {stockNotification.message}
+          </Typography>
+        </Alert>
+      </Snackbar>
+
+      {/* Empty Quantity Modal */}
+      <Dialog open={emptyQuantityModal.open} onClose={() => setEmptyQuantityModal({ open: false, itemIndex: null, newQuantity: '' })} maxWidth="sm" fullWidth>
+        <DialogTitle>Quantity Required</DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ mb: 2 }}>
+            Please enter a quantity or remove this item from your enquiry:
+          </DialogContentText>
+          <TextField
+            fullWidth
+            label="Enter Quantity"
+            type="number"
+            value={emptyQuantityModal.newQuantity}
+            onChange={(e) => setEmptyQuantityModal(prev => ({ ...prev, newQuantity: e.target.value }))}
+            inputProps={{ min: 1 }}
+            sx={{ mb: 2 }}
+            autoFocus
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            color="error" 
+            onClick={handleRemoveFromModal}
+            startIcon={<DeleteIcon />}
+          >
+            Remove Item
+          </Button>
+          <Button 
+            variant="contained" 
+            onClick={handleConfirmQuantity}
+            disabled={!emptyQuantityModal.newQuantity || parseInt(emptyQuantityModal.newQuantity) < 1}
+          >
+            Confirm Quantity
+          </Button>
+        </DialogActions>
+      </Dialog>
 
     </Container>
   );

@@ -24,21 +24,53 @@ const cartSlice = createSlice({
       // Recalculate totals
       cartSlice.caseReducers.calculateTotals(state);
     },
+
+    addDuplicateToCart: (state, action) => {
+      const { product, quantity = 1 } = action.payload;
+      // Always add as a new separate entry (for multiple quantities of same product)
+      state.items.push({ 
+        product, 
+        quantity,
+        // Add a unique identifier to distinguish between duplicate entries
+        cartId: Date.now() + Math.random()
+      });
+      
+      // Recalculate totals
+      cartSlice.caseReducers.calculateTotals(state);
+    },
     
     removeFromCart: (state, action) => {
-      const productId = action.payload;
-      state.items = state.items.filter(item => item.product._id !== productId);
+      const { productId, cartId } = action.payload;
+      if (cartId) {
+        // Remove specific duplicate item by cartId
+        state.items = state.items.filter(item => item.cartId !== cartId);
+      } else {
+        // Remove by productId (original behavior)
+        state.items = state.items.filter(item => item.product._id !== productId);
+      }
       cartSlice.caseReducers.calculateTotals(state);
     },
     
     updateQuantity: (state, action) => {
-      const { productId, quantity } = action.payload;
-      const existingItem = state.items.find(item => item.product._id === productId);
+      const { productId, quantity, cartId } = action.payload;
+      
+      let existingItem;
+      if (cartId) {
+        // Find specific duplicate item by cartId
+        existingItem = state.items.find(item => item.cartId === cartId);
+      } else {
+        // Find by productId (original behavior)
+        existingItem = state.items.find(item => item.product._id === productId);
+      }
       
       if (existingItem) {
         if (quantity <= 0) {
           // Remove item if quantity is 0 or less
-          state.items = state.items.filter(item => item.product._id !== productId);
+          if (cartId) {
+            state.items = state.items.filter(item => item.cartId !== cartId);
+          } else {
+            state.items = state.items.filter(item => item.product._id !== productId);
+          }
         } else {
           existingItem.quantity = quantity;
         }
@@ -71,6 +103,7 @@ const cartSlice = createSlice({
 
 export const {
   addToCart,
+  addDuplicateToCart,
   removeFromCart,
   updateQuantity,
   clearCart,

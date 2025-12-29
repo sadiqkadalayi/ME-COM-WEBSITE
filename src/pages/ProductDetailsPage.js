@@ -293,10 +293,6 @@ const ProductDetailsPage = () => {
             </Box>
           </Box>
 
-          <Typography variant="h5" sx={{ color: '#d32f2f', fontWeight: 700, mb: 2 }}>
-            {(product.currency || 'QAR')} {totalPriceForMain}
-          </Typography>
-
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
             <Box 
               sx={{ 
@@ -430,72 +426,43 @@ const ProductDetailsPage = () => {
             </Box>
           </Paper>
 
-          {/* Price Calculator */}
-          <Paper sx={{ p: 3, mb: 3, backgroundColor: '#f5f5f5' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-              <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                PRICE CALCULATOR
-              </Typography>
-              <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                {product.currency}
-              </Typography>
-            </Box>
+          {/* Action Buttons */}
+          <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+            <Button 
+              variant="outlined"
+              fullWidth
+              onClick={handleAddToCart}
+              sx={{ 
+                py: 1.5,
+                fontSize: 12,
+                fontWeight: 'bold',
+                borderColor: '#1976d2',
+                color: '#1976d2',
+                '&:hover': {
+                  borderColor: '#1565c0',
+                  backgroundColor: '#f5f5f5'
+                }
+              }}
+            >
+              ADD TO ENQUIRY
+            </Button>
             
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-              <Typography variant="body2">
-                Total (Quantity: {quantity})
-              </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                {totalPrice}
-              </Typography>
-            </Box>
-            
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-              <Typography variant="body2">
-                Price per unit
-              </Typography>
-              <Typography variant="body2">
-                {product.price.toFixed(2)}
-              </Typography>
-            </Box>
-
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <Button 
-                variant="outlined"
-                fullWidth
-                onClick={handleAddToCart}
-                sx={{ 
-                  py: 1.5,
-                  fontSize: 12,
-                  fontWeight: 'bold',
-                  borderColor: '#1976d2',
-                  color: '#1976d2',
-                  '&:hover': {
-                    borderColor: '#1565c0',
-                    backgroundColor: '#f5f5f5'
-                  }
-                }}
-              >
-                ADD TO CART UNBRANDED
-              </Button>
-              
-              <Button 
-                variant="contained"
-                fullWidth
-                sx={{ 
-                  py: 1.5,
-                  fontSize: 12,
-                  fontWeight: 'bold',
-                  backgroundColor: '#1976d2',
-                  '&:hover': {
-                    backgroundColor: '#1565c0'
-                  }
-                }}
-              >
-                PERSONALIZE
-              </Button>
-            </Box>
-          </Paper>
+            <Button 
+              variant="contained"
+              fullWidth
+              sx={{ 
+                py: 1.5,
+                fontSize: 12,
+                fontWeight: 'bold',
+                backgroundColor: '#1976d2',
+                '&:hover': {
+                  backgroundColor: '#1565c0'
+                }
+              }}
+            >
+              PERSONALIZE
+            </Button>
+          </Box>
 
           {/* Production Timeline */}
           <Paper sx={{ p: 3, backgroundColor: '#f0f0f0' }}>
