@@ -16,6 +16,7 @@ import { Add as AddIcon, Remove as RemoveIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { addToCart } from '../redux/CartSlice';
+import { getProductUrl } from '../utils/urlUtils';
 
 const ProductCard = ({ product, quantities, onQuantityChange }) => {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ const ProductCard = ({ product, quantities, onQuantityChange }) => {
   };
 
   const handleProductClick = () => {
-    navigate(`/product/${product._id}`);
+    navigate(getProductUrl(product));
   };
 
   const handleAddToCart = () => {

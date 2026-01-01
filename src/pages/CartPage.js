@@ -277,30 +277,7 @@ const CartPage = () => {
         </Breadcrumbs>
       </Box>
 
-      {/* Progress Steps */}
-      <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Chip 
-          label="Review Order" 
-          sx={{ 
-            backgroundColor: '#1976d2', 
-            color: 'white',
-            fontSize: 11,
-            fontWeight: 600
-          }} 
-        />
-        <ArrowForwardIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-        <Chip 
-          label="Shipping" 
-          variant="outlined" 
-          sx={{ fontSize: 11, color: 'text.secondary' }}
-        />
-        <ArrowForwardIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-        <Chip 
-          label="Payment" 
-          variant="outlined" 
-          sx={{ fontSize: 11, color: 'text.secondary' }}
-        />
-      </Box>
+     
 
       <Typography variant="h4" sx={{ mb: 4, fontWeight: 600 }}>
         Order overview
@@ -322,6 +299,22 @@ const CartPage = () => {
               Clear Cart
             </Button>
           </Box>
+
+          {/* Highlight Notification for Multiple Quantity */}
+          <Alert 
+            severity="info" 
+            sx={{ 
+              mb: 2, 
+              backgroundColor: '#e3f2fd', 
+              border: '1px solid #2196f3',
+              fontSize: 12,
+              '& .MuiAlert-icon': {
+                fontSize: 16
+              }
+            }}
+          >
+            💡 <strong>Need multiple quantity pricing?</strong> Use the "Another Quantity" button to add the same product with different quantities.
+          </Alert>
 
           {/* Cart Items List */}
           <Box sx={{ mb: 4 }}>
@@ -475,17 +468,17 @@ const CartPage = () => {
                 py: 1.5,
                 fontSize: 12,
                 fontWeight: 700,
-                backgroundColor: '#1976d2',
+                backgroundColor: '#0b3a4a',
                 mb: 2,
                 '&:hover': {
-                  backgroundColor: '#1565c0'
+                  backgroundColor: '#1c586eff'
                 }
               }}
             >
               {checkoutLoading ? (
                 <CircularProgress size={20} sx={{ color: 'white' }} />
               ) : (
-                <>Checkout <ArrowForwardIcon sx={{ ml: 1, fontSize: 16 }} /></>
+                <>REQUEST QUOTE <ArrowForwardIcon sx={{ ml: 1, fontSize: 16 }} /></>
               )}
             </Button>
 
@@ -504,7 +497,7 @@ const CartPage = () => {
                   textDecoration: 'underline',
                   border: 'none',
                   background: 'none',
-                  color: '#1976d2'
+                  color: '#0b3a4a'
                 }}
               >
                 ← Continue shopping

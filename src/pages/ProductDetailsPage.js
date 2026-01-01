@@ -28,9 +28,17 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchProductById, clearCurrentProduct } from '../redux/ProductsSlice';
 import { addToCart } from '../redux/CartSlice';
+import { getProductUrl } from '../utils/urlUtils';
+import { 
+  generateProductSEO, 
+  generateProductStructuredData, 
+  generateBreadcrumbStructuredData,
+  updateDocumentHead, 
+  addStructuredData 
+} from '../utils/seoUtils';
 
 const ProductDetailsPage = () => {
-  const { productId } = useParams();
+  const { productTitle, productId } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   
@@ -58,6 +66,32 @@ const ProductDetailsPage = () => {
   useEffect(() => {
     if (product && product.colors && product.colors.length > 0) {
       setSelectedColor(product.colors[0]);
+    }
+  }, [product]);
+
+  // SEO optimization when product loads
+  useEffect(() => {
+    if (product) {
+      // Generate SEO data
+      const seoData = generateProductSEO(product);
+      
+      // Update document head with meta tags
+      updateDocumentHead(seoData);
+      
+      // Generate and add structured data
+      const productStructuredData = generateProductStructuredData(product);
+      
+      // Generate breadcrumb structured data
+      const breadcrumbs = [
+        { name: 'Home', url: window.location.origin },
+        { name: 'Products', url: `${window.location.origin}/products` },
+        { name: product.product_name, url: window.location.href }
+      ];
+      const breadcrumbStructuredData = generateBreadcrumbStructuredData(breadcrumbs);
+      
+      // Combine structured data
+      const combinedStructuredData = [productStructuredData, breadcrumbStructuredData];
+      addStructuredData(combinedStructuredData);
     }
   }, [product]);
 

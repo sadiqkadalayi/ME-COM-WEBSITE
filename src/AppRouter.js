@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import CategoryPage from './pages/CategoryPage';
 import ProductDetailsPage from './pages/ProductDetailsPage';
+import ProductRedirect from './components/ProductRedirect';
 import CartPage from './pages/CartPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -16,7 +17,9 @@ const AppRouter = () => (
   <Routes>
     <Route path="/" element={<HomePage />} />
     <Route path="/category/:categorySlug" element={<CategoryPage />} />
-    <Route path="/product/:productId" element={<ProductDetailsPage />} />
+    <Route path="/product/:productTitle/:productId" element={<ProductDetailsPage />} />
+    {/* Redirect old product URLs to new SEO format */}
+    <Route path="/product/:productId" element={<ProductRedirect />} />
     <Route path="/cart" element={<CartPage />} />
     <Route path="/login" element={<LoginPage />} />
     <Route path="/register" element={<RegisterPage />} />
