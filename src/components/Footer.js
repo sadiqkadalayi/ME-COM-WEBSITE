@@ -1,34 +1,71 @@
 import React from 'react';
 import { Box, Container, Typography, Grid, Button, TextField, Divider, Link } from '@mui/material';
+import { Facebook, LinkedIn, Instagram } from '@mui/icons-material';
+
+// Import client logos
+import client1 from '../assets/clients/client-01.png';
+import client2 from '../assets/clients/client-02.png';
+import client3 from '../assets/clients/client-03.png';
+import client4 from '../assets/clients/client-04.png';
+import client5 from '../assets/clients/client-05.png';
+import client6 from '../assets/clients/client-06.png';
 
 const Footer = () => {
   return (
     <Box sx={{ background: '#fff', pt: 6 }}>
-      {/* Certifications */}
+      {/* Client Logos */}
       <Container maxWidth="lg" sx={{ textAlign: 'center', mb: 4 }}>
-        <Typography variant="h5" fontWeight={600} gutterBottom>
-          Our Certifications
-        </Typography>
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 4, flexWrap: 'wrap', mb: 2 }}>
-          <img src="https://www.jasani.ae/web/image/355066-2320df44/image.png" alt="Sedex" style={{ height: 48 }} />
-          <img src="https://www.jasani.ae/web/image/334748-516e7606/89.webp" alt="Ecovadis" style={{ height: 48 }} />
-          <img src="https://www.jasani.ae/web/image/355067-2320df44/image.png" alt="ICV" style={{ height: 48 }} />
+        
+        <Box sx={{ 
+          overflow: 'hidden', 
+          width: '100%', 
+          height: '80px',
+          position: 'relative',
+          '&::before, &::after': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            width: '100px',
+            height: '100%',
+            zIndex: 2,
+          },
+          '&::before': {
+            left: 0,
+            background: 'linear-gradient(to right, #fff, transparent)',
+          },
+          '&::after': {
+            right: 0,
+            background: 'linear-gradient(to left, #fff, transparent)',
+          }
+        }}>
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            animation: 'scroll 60s linear infinite',
+            width: 'max-content',
+            '@keyframes scroll': {
+              '0%': { transform: 'translateX(100%)' },
+              '100%': { transform: 'translateX(-100%)' }
+            }
+          }}>
+            <img src={client1} alt="Client 1" style={{ height: '48px' }} />
+            <img src={client2} alt="Client 2" style={{ height: '48px' }} />
+            <img src={client3} alt="Client 3" style={{ height: '48px' }} />
+            <img src={client4} alt="Client 4" style={{ height: '48px' }} />
+            <img src={client5} alt="Client 5" style={{ height: '48px' }} />
+            <img src={client6} alt="Client 6" style={{ height: '48px' }} />
+            {/* Duplicate logos for seamless loop */}
+            <img src={client1} alt="Client 1" style={{ height: '48px' }} />
+            <img src={client2} alt="Client 2" style={{ height: '48px' }} />
+            <img src={client3} alt="Client 3" style={{ height: '48px' }} />
+            <img src={client4} alt="Client 4" style={{ height: '48px' }} />
+            <img src={client5} alt="Client 5" style={{ height: '48px' }} />
+            <img src={client6} alt="Client 6" style={{ height: '48px' }} />
+          </Box>
         </Box>
       </Container>
-      {/* Reseller Portal */}
-      <Box sx={{ background: '#f8f9fa', py: 4 }}>
-        <Container maxWidth="lg" sx={{ textAlign: 'center' }}>
-          <Typography variant="h6" fontWeight={600} gutterBottom>
-            Get access to our reseller portal!
-          </Typography>
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            And avail our many partnership benefits.
-          </Typography>
-          <Button variant="contained" sx={{ mt: 2, borderRadius: 8, px: 4 }}>
-            GET IN TOUCH WITH US &gt;
-          </Button>
-        </Container>
-      </Box>
+      
       {/* Main Footer - 3 columns */}
       <Box sx={{ background: 'linear-gradient(90deg, #232526 0%, #414345 100%)', color: '#fff', py: 6 }}>
         <Container maxWidth="lg">
@@ -36,25 +73,26 @@ const Footer = () => {
             {/* Column 1: About & Social */}
             <Grid size={{ xs: 12, md: 4 }}>
               <Typography variant="h5" fontWeight={600} gutterBottom>
-                The #1 premium corporate gifts supplier in the Middle East.
+                ME Gift Packs
               </Typography>
               <Typography variant="body2" sx={{ mb: 2 }}>
-                <span role="img" aria-label="check">✔️</span> 30+ years of deep expertise in branded merchandise, corporate & promotional giveaways<br />
-                <span role="img" aria-label="check">✔️</span> Extensive collection of over 2,750 ready-stock products and counting...<br />
-                <span role="img" aria-label="check">✔️</span> Diverse range of premium brands including Moleskine, Cross, Skross, Ocean Bottle, Stormtech, XDDesign, and a lot more!<br />
-                <span role="img" aria-label="check">✔️</span> Custom items such as drinkware, notebooks, bags, and so much more!<br />
-                <span role="img" aria-label="check">✔️</span> Serving clients across <b>Middle East, Africa and India!</b>
+                <span role="img" aria-label="check"></span> 
+                Your one stop solution provider for all your Corporate Gifts, office stationery supplies, 
+                print management solutions and Food Grade disposable products and many more..
+                
               </Typography>
               <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                <Link href="#" color="inherit"><img src="/facebook.svg" alt="Facebook" height={24} /></Link>
-                <Link href="#" color="inherit"><img src="/linkedin.svg" alt="LinkedIn" height={24} /></Link>
-                <Link href="#" color="inherit"><img src="/instagram.svg" alt="Instagram" height={24} /></Link>
+                <Link href="#" color="inherit" sx={{ '&:hover': { color: '#1976d2' } }}>
+                  <Facebook fontSize="medium" />
+                </Link>
+                <Link href="#" color="inherit" sx={{ '&:hover': { color: '#0077b5' } }}>
+                  <LinkedIn fontSize="medium" />
+                </Link>
+                <Link href="#" color="inherit" sx={{ '&:hover': { color: '#e4405f' } }}>
+                  <Instagram fontSize="medium" />
+                </Link>
               </Box>
-              <Box sx={{ mt: 2 }}>
-                <Typography variant="body2">We Accept</Typography>
-                <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa" height={24} style={{ marginRight: 8 }} />
-                <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/MasterCard_Logo.svg" alt="Mastercard" height={24} />
-              </Box>
+              
             </Grid>
             {/* Column 2: Links (3 sub-columns) */}
             <Grid size={{ xs: 12, md: 8 }}>
@@ -62,56 +100,60 @@ const Footer = () => {
                 <Grid size={{ xs: 12, md: 4 }}>
                   <Typography variant="subtitle2" fontWeight={600} gutterBottom>COMPANY INFO</Typography>
                   <Box>
-                    <Link href="#" color="inherit" underline="hover">About Us</Link><br />
-                    <Link href="#" color="inherit" underline="hover">Sustainability</Link><br />
-                    <Link href="#" color="inherit" underline="hover">Privacy Policy</Link><br />
-                    <Link href="#" color="inherit" underline="hover">Jobs</Link><br />
-                    <Link href="#" color="inherit" underline="hover">Contact Us</Link>
+                    <Typography variant="body2" sx={{ mb: 1, color: '#fff' }}>
+                      
+                    </Typography>
+                    <Typography variant="body2" sx={{ mb: 1, color: '#ccc', fontSize: '0.85rem' }}>
+                      Opposite Majlis Hypermarket, <br />
+                      1st Floor, Building no 239, Zone 41, <br />
+                      Street 230, C ring Road, Doha
+                    </Typography>
+                    <Typography variant="body2" sx={{ mb: 2, color: '#ccc', fontSize: '0.85rem' }}>
+                      Email: info@megiftpacks.com<br />
+                      Phone: +97 3133 1225
+                    </Typography>
+                  
                   </Box>
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }}>
-                  <Typography variant="subtitle2" fontWeight={600} gutterBottom>PRODUCTS</Typography>
+                  <Typography variant="subtitle2" fontWeight={600} gutterBottom>PAGES</Typography>
                   <Box>
-                    <Link href="#" color="inherit" underline="hover">Home</Link><br />
-                    <Link href="#" color="inherit" underline="hover">E-Catalog</Link><br />
-                    <Link href="#" color="inherit" underline="hover">Products</Link><br />
-                    <Link href="#" color="inherit" underline="hover">Brands</Link><br />
-                    <Link href="#" color="inherit" underline="hover">Branding Methods</Link>
+                    <Link href="#" color="inherit" underline="hover" sx={{ fontSize: '0.85rem' }}>Home</Link><br />
+                    <Link href="#" color="inherit" underline="hover" sx={{ fontSize: '0.85rem' }}>About Us</Link><br />
+                    <Link href="#" color="inherit" underline="hover" sx={{ fontSize: '0.85rem' }}>Privacy Policy</Link><br />
+                    <Link href="#" color="inherit" underline="hover" sx={{ fontSize: '0.85rem' }}>Contact Us</Link><br />
+                    <Link href="#" color="inherit" underline="hover" sx={{ fontSize: '0.85rem' }}>Our Locations</Link>
                   </Box>
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }}>
-                  <Typography variant="subtitle2" fontWeight={600} gutterBottom>SUPPORT</Typography>
-                  <Box>
-                    <Link href="#" color="inherit" underline="hover">FAQs</Link><br />
-                    <Link href="#" color="inherit" underline="hover">APIs</Link><br />
-                    <Link href="#" color="inherit" underline="hover">Reseller Registration</Link><br />
-                    <Link href="#" color="inherit" underline="hover">Our Locations</Link><br />
-                    <Link href="#" color="inherit" underline="hover">Blogs</Link>
+                  <Typography variant="subtitle2" fontWeight={600} gutterBottom>LOCATION</Typography>
+                  <Box sx={{ 
+                    width: '100%', 
+                    height: '100px', 
+                    border: '1px solid #555',
+                    borderRadius: '8px',
+                    overflow: 'hidden'
+                  }}>
+                    <iframe
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3608.2374130423677!2d51.53249609999999!3d25.262597799999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6d5bfaefde9966a3%3A0xe0e92d42a85a3e21!2sME%20Gift%20Packs%20Qatar%20-%20Corporate%20Gifts%20%26%20Promotional%20Gifts%20Company%20Qatar!5e0!3m2!1sen!2sqa!4v1748156423409!5m2!1sen!2sqa"
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      allowFullScreen=""
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title="ME Gift Packs Location"
+                    ></iframe>
                   </Box>
                 </Grid>
-                {/* Contact/Newsletter section below links, spanning all 3 sub-columns */}
-                <Grid size={{ xs: 12 }}>
-                  <Divider sx={{ my: 2, background: 'rgba(255,255,255,0.2)' }} />
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
-                    <Button variant="outlined" color="inherit" sx={{ borderRadius: 8, color: '#fff', borderColor: '#fff' }}>EMAIL</Button>
-                    <Button variant="outlined" color="inherit" sx={{ borderRadius: 8, color: '#fff', borderColor: '#fff' }}>CALL</Button>
-                    <Button variant="outlined" color="inherit" sx={{ borderRadius: 8, color: '#fff', borderColor: '#fff' }}>WHATSAPP</Button>
-                  </Box>
-                  <Typography variant="body2" sx={{ mb: 1 }}>Our Offices: <b>Dubai</b> <b>Abu Dhabi</b> <b>Saudi Arabia</b> <b>Qatar</b> <b>South Africa</b> <b>India</b></Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, flexWrap: 'wrap' }}>
-                    <TextField size="small" placeholder="your email..." variant="outlined" sx={{ background: '#fff', borderRadius: 1, input: { color: '#222' } }} />
-                    <Button variant="contained" sx={{ borderRadius: 1, px: 3 }}>Subscribe</Button>
-                  </Box>
-                  <Typography variant="caption" sx={{ color: '#fff', mt: 1, display: 'block' }}>
-                    For complaints or feedback about our services, please email our Managing Director at <b>biren@jasani.ae</b> for immediate action.
-                  </Typography>
-                </Grid>
+               
+                
               </Grid>
             </Grid>
           </Grid>
         </Container>
         <Box sx={{ textAlign: 'center', color: '#ccc', fontSize: 13, mt: 4 }}>
-          Copyright © Jasani LLC 2004 - 2025. All rights reserved.
+          Copyright © ME Gift Packs {new Date().getFullYear()}. All rights reserved. <br/><span style={{fontSize:'11px'}}>All product names, logos, and brands are property of their respective owners. All company, product and service names used in this website are for identification purposes only. Use of these names, logos, and brands does not imply endorsement.</span>
         </Box>
       </Box>
     </Box>

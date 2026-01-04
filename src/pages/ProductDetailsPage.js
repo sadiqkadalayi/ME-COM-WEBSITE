@@ -344,7 +344,7 @@ const ProductDetailsPage = () => {
 
           {/* Expandable Sections */}
           <Box sx={{ mb: 4 }}>
-            <Accordion>
+            <Accordion defaultExpanded>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="body1" sx={{ fontWeight: 600 }}>
                   Item Description

@@ -241,7 +241,7 @@ const CartPage = () => {
 
   if (items.length === 0) {
     return (
-      <Container maxWidth="xl" sx={{ mt: 5, pb: 4 }}>
+      <Container maxWidth="lg" sx={{ mt: { xs: 2, md: 5 }, pb: 4, px: { xs: 1, sm: 2 } }}>
         <Box sx={{ textAlign: 'center', py: 8 }}>
           <Typography variant="h5" sx={{ mb: 3, color: 'text.secondary' }}>
             Your cart is empty
@@ -259,19 +259,19 @@ const CartPage = () => {
   }
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 5, pb: 4 }}>
+    <Container maxWidth="lg" sx={{ mt: { xs: 2, md: 5 }, pb: 4, px: { xs: 1, sm: 2 } }}>
       {/* Breadcrumbs */}
-      <Box sx={{ mb: 3 }}>
+      <Box sx={{ mb: { xs: 2, md: 3 } }}>
         <Breadcrumbs aria-label="breadcrumb">
           <Link 
             underline="hover" 
-            sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', fontSize: 11 }}
+            sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', fontSize: { xs: 10, md: 11 } }}
             onClick={() => navigate('/')}
           >
             <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" />
             Home
           </Link>
-          <Typography color="text.primary" sx={{ fontSize: 11 }}>
+          <Typography color="text.primary" sx={{ fontSize: { xs: 10, md: 11 } }}>
             Review Order
           </Typography>
         </Breadcrumbs>
@@ -279,11 +279,11 @@ const CartPage = () => {
 
      
 
-      <Typography variant="h4" sx={{ mb: 4, fontWeight: 600 }}>
+      <Typography variant="h4" sx={{ mb: { xs: 2, md: 4 }, fontWeight: 600, fontSize: { xs: '1.5rem', md: '2rem' } }}>
         Order overview
       </Typography>
 
-      <Grid container spacing={4}>
+      <Grid container spacing={{ xs: 2, md: 4 }}>
         {/* Left Side - Cart Items */}
         <Grid size={{ xs: 12, md: 8 }}>
           <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -320,7 +320,7 @@ const CartPage = () => {
           <Box sx={{ mb: 4 }}>
             {items.map((item, index) => (
               <Paper key={item.cartId || item.product._id + '_' + index} sx={{ p: 3, mb: 2, border: '1px solid #e5e5e5' }}>
-                <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
+                <Box sx={{ display: 'flex', gap: 3, alignItems: 'center', mb: 2 }}>
                   {/* Product Image */}
                   <Card sx={{ width: 80, height: 80, flexShrink: 0 }}>
                     <CardMedia
@@ -346,8 +346,29 @@ const CartPage = () => {
                     )}
                   </Box>
 
+                  {/* Remove Button */}
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <IconButton 
+                      size="small" 
+                      color="error"
+                      onClick={() => handleRemoveItem(index)}
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                </Box>
+
+                {/* Bottom Section - Quantity Controls and Another Quantity Button */}
+                <Box sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  pt: 2,
+                  borderTop: '1px solid #f0f0f0'
+                }}>
                   {/* Quantity Controls */}
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography sx={{ fontSize: 12, fontWeight: 600, mr: 1 }}>Quantity:</Typography>
                     <IconButton 
                       size="small" 
                       onClick={() => handleQuantityChange(index, item.quantity - 1)}
@@ -384,24 +405,15 @@ const CartPage = () => {
                     </IconButton>
                   </Box>
 
-                  {/* Duplicate Button and Remove */}
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 120 }}>
-                    <Button 
-                      size="small" 
-                      variant="outlined"
-                      onClick={() => handleDuplicateItem(item.product)}
-                      sx={{ fontSize: '10px', py: 0.5 }}
-                    >
-                      Another Quantity
-                    </Button>
-                    <IconButton 
-                      size="small" 
-                      color="error"
-                      onClick={() => handleRemoveItem(index)}
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </Box>
+                  {/* Another Quantity Button */}
+                  <Button 
+                    size="small" 
+                    variant="outlined"
+                    onClick={() => handleDuplicateItem(item.product)}
+                    sx={{ fontSize: '10px', py: 0.5 }}
+                  >
+                    Another Quantity
+                  </Button>
                 </Box>
               </Paper>
             ))}

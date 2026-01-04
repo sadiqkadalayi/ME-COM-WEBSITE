@@ -281,9 +281,9 @@ const Header = () => {
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <PhoneIcon sx={{ fontSize: 16, mr: 0.5, verticalAlign: 'middle' }} />
-              <span style={{ marginRight: 8 }}>+974 6642 6697</span>
-              <span style={{ marginRight: 8 }}>| 31331225</span>
-              <span>| 31331226</span>
+              <span style={{ marginRight: 8 }}>+974 4483 6285</span>
+              <span style={{ marginRight: 8 }}>| 3133 1225</span>
+              <span>| 3133 1226</span>
             </Box>
           </Box>
         </Container>

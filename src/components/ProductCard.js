@@ -49,7 +49,7 @@ const ProductCard = ({ product, quantities, onQuantityChange }) => {
     <Card sx={{ 
       position: 'relative',
       width: '100%',
-      height: 350,
+      height: 300,
       display: 'flex',
       flexDirection: 'column',
       boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
@@ -77,7 +77,7 @@ const ProductCard = ({ product, quantities, onQuantityChange }) => {
             fontSize: '10px',
             fontWeight: 600,
             zIndex: 2,
-            height: '20px'
+            height: '00px'
           }}
         />
       )}
@@ -121,7 +121,7 @@ const ProductCard = ({ product, quantities, onQuantityChange }) => {
               width: '90%',
               height: '90%',
               objectFit: 'contain',
-              padding: 2
+              padding: 0
             }}
             image={getProductImageUrl(product)}
             alt={product.product_name}
